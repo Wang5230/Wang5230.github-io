@@ -4,18 +4,10 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="Mybatis, Wang5230">
-    <meta name="description" content="框架
-框架的概念:软件开发中的一套解决方案，不同方案可以解决不同的问题，封装了许多的细节，可以使开发效率大幅度提高。
-三层架构：
-表现层：数据的展示
-业务层：处理业务需求
-持久层：与数据库交互
-
-
-持久层的技术解决方案
-JDBC技术
-Con">
+    <meta name="keywords" content="TensorFlow, Wang5230">
+    <meta name="description" content="module ‘tensorflow’ has no attribute ‘Session’已修复在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码
+import tensorflow as tf
+t">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -23,7 +15,7 @@ Con">
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>Mybatis | Wang5230</title>
+    <title>TensorFlow | Wang5230</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -293,13 +285,13 @@ Con">
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/5.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/17.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        Mybatis
+                        TensorFlow
                     </div>
                 </div>
             </div>
@@ -411,8 +403,8 @@ Con">
                     
                     <div class="article-tag">
                         
-                            <a href="/tags/java/">
-                                <span class="chip bg-color">java</span>
+                            <a href="/tags/python/">
+                                <span class="chip bg-color">python</span>
                             </a>
                         
                     </div>
@@ -426,7 +418,7 @@ Con">
             <div class="post-info">
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-minus fa-fw"></i>发布日期:&nbsp;&nbsp;
-                    2019-12-26
+                    2020-08-26
                 </div>
                 
                 
@@ -449,150 +441,9 @@ Con">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="框架"><a href="#框架" class="headerlink" title="框架"></a>框架</h2><ol>
-<li>框架的概念:软件开发中的一套解决方案，不同方案可以解决不同的问题，封装了许多的细节，可以使开发效率大幅度提高。</li>
-<li>三层架构：<ul>
-<li>表现层：数据的展示</li>
-<li>业务层：处理业务需求</li>
-<li>持久层：与数据库交互</li>
-</ul>
-</li>
-<li>持久层的技术解决方案<ul>
-<li>JDBC技术<ul>
-<li>Connection</li>
-<li>PreparedStatement</li>
-<li>ResultSet</li>
-</ul>
-</li>
-<li>Spring的JdbcTemplate:Spring对jdbc的简单封装</li>
-<li>Apache的DBUtiles:与SPring的jdbcTemplate很像，也是对与jdbc的简单封装</li>
-</ul>
-</li>
-<li>mybatis是一个持久层的框架，封装了jdbc操作的细节，使用了ORM思想，实现了结果集的封装。<br>ORM(Object Relational Mapping)将数据库表和实体类及实体类的属性对应起来可以操作实体类就实现操作数据库表</li>
-</ol>
-<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><ol>
-<li><p>使用IDE创建出一个maven项目</p>
-</li>
-<li><p>选择项目地打包方式，在项目中引入依赖</p>
-<pre class="line-numbers language-java"><code class="language-java"><span class="token operator">&lt;</span>groupId<span class="token operator">></span>com<span class="token punctuation">.</span>itheima<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
- <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>first_mybatis<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
- <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">1.0</span><span class="token operator">-</span>SNAPSHOT<span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
- <span class="token operator">&lt;</span>packaging<span class="token operator">></span>jar<span class="token operator">&lt;</span><span class="token operator">/</span>packaging<span class="token operator">></span>
- <span class="token operator">&lt;</span>dependencies<span class="token operator">></span>
-     <span class="token operator">&lt;</span>dependency<span class="token operator">></span>
-     <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>mybatis<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
-     <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>mybatis<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
-     <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">3.4</span><span class="token punctuation">.</span><span class="token number">5</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
- <span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
-     <span class="token operator">&lt;</span>dependency<span class="token operator">></span>
-         <span class="token operator">&lt;</span>groupId<span class="token operator">></span>mysql<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>mysql<span class="token operator">-</span>connector<span class="token operator">-</span>java<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">6.0</span><span class="token punctuation">.</span><span class="token number">5</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
-     <span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
-     <span class="token operator">&lt;</span>dependency<span class="token operator">></span>
-         <span class="token operator">&lt;</span>groupId<span class="token operator">></span>log4j<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>log4j<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">1.2</span><span class="token punctuation">.</span><span class="token number">12</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
-     <span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
-     <span class="token operator">&lt;</span>dependency<span class="token operator">></span>
-         <span class="token operator">&lt;</span>groupId<span class="token operator">></span>junit<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>junit<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">4.12</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
-     <span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
- <span class="token operator">&lt;</span><span class="token operator">/</span>dependencies<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-</li>
-<li><p>接下来在src中创建数据库表中对应的对象，且要implements Serializable使对象序列化接下来是一些基本你的操作，将所有属性私有化留出get和set方法</p>
-</li>
-<li><p>接下来创建出一个IuserDao的接口(I的意思只是Interface)称为用户的持久层接口，在其中创建查询所有操作的序列。</p>
-</li>
-<li><p>配置mybtis的环境，创建一个xml文件在resources文件夹下,在创建完成后需要在相应的mapper位置下建立对应的配置，且引入mapper的约束。</p>
-</li>
-</ol>
-<p>Config配置</p>
-<pre class="line-numbers language-xml"><code class="language-xml"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8" ?></span>
-<span class="token doctype">&lt;!DOCTYPE configuration
-        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-config.dtd"></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>configuration</span><span class="token punctuation">></span></span>
-    <span class="token comment" spellcheck="true">&lt;!--配置环境--></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>environments</span> <span class="token attr-name">default</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>mysql<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-        <span class="token comment" spellcheck="true">&lt;!--配置mysql环境--></span>
-        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>environment</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>mysql<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-            <span class="token comment" spellcheck="true">&lt;!--配置事务类型--></span>
-            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>transactionManager</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>JDBC<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>transactionManager</span><span class="token punctuation">></span></span>
-            <span class="token comment" spellcheck="true">&lt;!--配置连接池--></span>
-            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dataSource</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>POOLED<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-                <span class="token comment" spellcheck="true">&lt;!--配置连接数据库的基本信息--></span>
-                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>driver<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com.mysql,jdbc.Driver<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>url<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>jdbc:mysql://localhost:3306/mybatis<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>username<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>root<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>password<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>root<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dataSource</span><span class="token punctuation">></span></span>
-        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>environment</span><span class="token punctuation">></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>environments</span><span class="token punctuation">></span></span>
-
-    <span class="token comment" spellcheck="true">&lt;!--指定映射配置文件--></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mappers</span><span class="token punctuation">></span></span>
-        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mapper</span> <span class="token attr-name">resource</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com/itheima.dao/IuserDao.xml<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mappers</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>configuration</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>mapper的配置</p>
-<pre class="line-numbers language-xml"><code class="language-xml"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8" ?></span>
-<span class="token doctype">&lt;!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" ></span>
-
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mapper</span> <span class="token attr-name">namespace</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com.itheima.dao.IUserDao<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-    <span class="token comment" spellcheck="true">&lt;!--配置查询所有--></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>select</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>findAll<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-        select * from USER
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>select</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mapper</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>至此环境搭建基本完成，在进行这些操作前需要将maven项目的环境搭建好，并建立好仓库等。</p>
-<h2 id="mybatis的实例"><a href="#mybatis的实例" class="headerlink" title="mybatis的实例"></a>mybatis的实例</h2><p>1.在test的java文件夹中以main函数来进行测试，且使用了工厂模式来进行sql语句的执行</p>
-<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception<span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">//1.读取配置文件</span>
-        InputStream inputStream <span class="token operator">=</span> Resources<span class="token punctuation">.</span><span class="token function">getResourceAsStream</span><span class="token punctuation">(</span><span class="token string">"SqlMapConfig.xml"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//2.创建SQL Session Factory工厂</span>
-        SqlSessionFactoryBuilder builder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SqlSessionFactoryBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        SqlSessionFactory factory <span class="token operator">=</span> builder<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span>inputStream<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//3.使用工厂生产SqlSession对象</span>
-        SqlSession session <span class="token operator">=</span> factory<span class="token punctuation">.</span><span class="token function">openSession</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//4.使用SQL Session创建Dao接口代理对象</span>
-        IUserDao userDao <span class="token operator">=</span> session<span class="token punctuation">.</span><span class="token function">getMapper</span><span class="token punctuation">(</span>IUserDao<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//5.使用代理对象执行方法</span>
-        List<span class="token operator">&lt;</span>User<span class="token operator">></span> users<span class="token punctuation">;</span>
-        users <span class="token operator">=</span> userDao<span class="token punctuation">.</span><span class="token function">findAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">for</span> <span class="token punctuation">(</span>User user <span class="token operator">:</span> users<span class="token punctuation">)</span><span class="token punctuation">{</span>
-            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-        <span class="token comment" spellcheck="true">//6.释放资源</span>
-        session<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        inputStream<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>执行后发现报错并不如愿，理想中的报错应该是返回由于映射的没有返回结果而报错，最终发现是自己的mapper地址写错，以及jdbc的驱动加载写错。</p>
-<ul>
-<li><p>mybatis的映射配置文件位置必须和dao接口的包接口相同</p>
-</li>
-<li><p>映射配置文件mapper的标签namespace属性取值必须是dao接口的全限定类名</p>
-</li>
-<li><p>映射配置文件的操作配置，id属性取值必须是dao接口的方法名。</p>
-</li>
-</ul>
-<h3 id="实例中使用到的几个类"><a href="#实例中使用到的几个类" class="headerlink" title="实例中使用到的几个类"></a>实例中使用到的几个类</h3><ol>
-<li>class Resources</li>
-<li>class SqlSessionFactoryBuilder</li>
-<li>interface SqlSessionFactory</li>
-<li>interface SqlSession</li>
-</ol>
-<p>在符合上面的几个条件的情况下，就不需要再写dao的实现类了。</p>
-<h3 id="注解方式来使用mybatis"><a href="#注解方式来使用mybatis" class="headerlink" title="注解方式来使用mybatis"></a>注解方式来使用mybatis</h3><p>则可以删除每个dao对应的dao.xml改为@select注解，并且指定SQL语句，在config文件中配置mappper时，使用class属性指定dao接口的全限定类名。</p>
-<h2 id="自定义MyBatis"><a href="#自定义MyBatis" class="headerlink" title="自定义MyBatis"></a>自定义MyBatis</h2><ol>
-<li><p>首先需要有数据库的连接信息，通过连接信息，可以创建Connection对象，接下来需要映射的配置信息，最后从映射中配置需要的SQL语句。就可以获取PreparedStatement。通过dom4j来解析这些xml配置。</p>
-</li>
-<li><p>根据配置文件的细腻些创建Connection对象，获取预处理对象PrepareSatement接下来执行查询，将遍历的结果集封装，将结果返回。</p>
-</li>
-</ol>
+                <h2 id="module-‘tensorflow’-has-no-attribute-‘Session’"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’"></a>module ‘tensorflow’ has no attribute ‘Session’</h2><h2 id="已修复"><a href="#已修复" class="headerlink" title="已修复"></a>已修复</h2><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
+tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
 
             </div>
             <hr/>
@@ -618,7 +469,7 @@ Con">
                     </i>
                 </span>
                 <span class="reprint-info">
-                    <a href="https://www.wang5230.github.io/2019/12/26/Mybatis/">https://www.wang5230.github.io/2019/12/26/Mybatis/</a>
+                    <a href="https://www.wang5230.github.io/2020/08/26/TensorFlow/">https://www.wang5230.github.io/2020/08/26/TensorFlow/</a>
                 </span>
             </div>
             <div class="reprint__notice">
@@ -656,8 +507,8 @@ Con">
                     
                         <div class="article-tag">
                             
-                                <a href="/tags/java/">
-                                    <span class="chip bg-color">java</span>
+                                <a href="/tags/python/">
+                                    <span class="chip bg-color">python</span>
                                 </a>
                             
                         </div>
@@ -828,26 +679,27 @@ Con">
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2020/08/26/TensorFlow/">
+                <a href="/2020/09/05/Machine_learing/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/17.jpg" class="responsive-img" alt="TensorFlow">
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="MachineLearning">
                         
-                        <span class="card-title">TensorFlow</span>
+                        <span class="card-title">MachineLearning</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            module ‘tensorflow’ has no attribute ‘Session’已修复在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码
-import tensorflow as tf
-t
+                            监督式学习指目标给定标签来进行分类等例如聚类，分类问题等
+无监督式学习指目标没有指定的标签，通过已有样本的特点来进行预测拟合，如回归分析
+线性回归
+代价函数(一般为平方差等，表示拟合量与实际值的偏差)通过寻找代价函数与目标函数参数关系寻找到
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-08-26
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-09-05
                         </span>
                         <span class="publish-author">
                             
@@ -875,27 +727,34 @@ t
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/12/01/学校假砖心路历程/">
+                <a href="/2019/12/26/Mybatis/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/13.jpg" class="responsive-img" alt="学校假砖心路历程">
+                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="Mybatis">
                         
-                        <span class="card-title">学校假砖心路历程</span>
+                        <span class="card-title">Mybatis</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            勉勉强强应付完了学校给的搬砖任务，总结一下经验与教训。
+                            框架
+框架的概念:软件开发中的一套解决方案，不同方案可以解决不同的问题，封装了许多的细节，可以使开发效率大幅度提高。
+三层架构：
+表现层：数据的展示
+业务层：处理业务需求
+持久层：与数据库交互
 
-在前后端分离开发的时候，一定要规范好数据和变量名的命名规范
-尽管php可以直接在html中直接生成动态页面，但直接将sql语句写在php文件中虽然实测用户在访问时是看不到的，但仍不是
+
+持久层的技术解决方案
+JDBC技术
+Con
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-01
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-26
                             </span>
                         <span class="publish-author">
                             
@@ -908,8 +767,8 @@ t
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/php/">
-                        <span class="chip bg-color">php</span>
+                    <a href="/tags/java/">
+                        <span class="chip bg-color">java</span>
                     </a>
                     
                 </div>
