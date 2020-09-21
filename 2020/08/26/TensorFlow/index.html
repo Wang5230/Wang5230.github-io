@@ -5,9 +5,7 @@
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
     <meta name="keywords" content="TensorFlow, Wang5230">
-    <meta name="description" content="module ‘tensorflow’ has no attribute ‘Session’已修复在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码
-import tensorflow as tf
-t">
+    <meta name="description" content="module ‘tensorflow’ has no attribute ‘Session’已修复在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytor">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -424,7 +422,7 @@ t">
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-09-15
+                    2020-09-21
                 </div>
                 
 
@@ -441,9 +439,11 @@ t">
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="module-‘tensorflow’-has-no-attribute-‘Session’"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’"></a>module ‘tensorflow’ has no attribute ‘Session’</h2><h2 id="已修复"><a href="#已修复" class="headerlink" title="已修复"></a>已修复</h2><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码</p>
+                <h2 id="module-‘tensorflow’-has-no-attribute-‘Session’"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’"></a>module ‘tensorflow’ has no attribute ‘Session’</h2><h2 id="已修复"><a href="#已修复" class="headerlink" title="已修复"></a>已修复</h2><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
-tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
+config <span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>ConfigProto<span class="token punctuation">(</span>allow_soft_placement<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+sess<span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>Session<span class="token punctuation">(</span>config<span class="token operator">=</span>config<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
 
             </div>
             <hr/>
