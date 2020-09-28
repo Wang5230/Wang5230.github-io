@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="TensorFlow, Wang5230">
+    <meta name="keywords" content="TensorFlow学习笔记, Wang5230">
     <meta name="description" content="module ‘tensorflow’ has no attribute ‘Session’已修复在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytor">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -13,7 +13,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>TensorFlow | Wang5230</title>
+    <title>TensorFlow学习笔记 | Wang5230</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -283,13 +283,13 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/17.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        TensorFlow
+                        TensorFlow学习笔记
                     </div>
                 </div>
             </div>
@@ -422,7 +422,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-09-21
+                    2020-09-28
                 </div>
                 
 
@@ -439,11 +439,74 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="module-‘tensorflow’-has-no-attribute-‘Session’"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’"></a>module ‘tensorflow’ has no attribute ‘Session’</h2><h2 id="已修复"><a href="#已修复" class="headerlink" title="已修复"></a>已修复</h2><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch</p>
+                <h2 id="module-‘tensorflow’-has-no-attribute-‘Session’"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’"></a>module ‘tensorflow’ has no attribute ‘Session’</h2><h3 id="已修复"><a href="#已修复" class="headerlink" title="已修复"></a>已修复</h3><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
 tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
 config <span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>ConfigProto<span class="token punctuation">(</span>allow_soft_placement<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
 sess<span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>Session<span class="token punctuation">(</span>config<span class="token operator">=</span>config<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="建立一个简单的回归分析模型"><a href="#建立一个简单的回归分析模型" class="headerlink" title="建立一个简单的回归分析模型"></a>建立一个简单的回归分析模型</h2><ol>
+<li>首先使用placeholder为输入与输出创建占位符，同时为权重和截距创建合适的变量</li>
+</ol>
+<pre class="line-numbers language-pyhton"><code class="language-pyhton">x = tf.placeholder(tf.float32 , shape = [None ,3]) #输入
+y_ture = tf.placeholder(tf.float32 , shape = None) #实际值
+w = tf.Variable([[0,0,0]] , dtype = tf.float32 , 
+name = 'weights')  #权重
+b = tf.Variable(0 , dtype = tf.float32 , name = 'bias') #截距
+y_pred = tf.matmul(w , tf.transpose(x)) + b #预测值<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ol start="2">
+<li>接下来，需要来评估模型的性能，为了刻画预测值与真实值的差异，需要订一个反应“距离”的度量，一般称为<strong>损失函数</strong>，通过寻找一组参数来最小化损失函数优化模型。一般使用<strong>MSE(均方差)和交叉熵</strong></li>
+</ol>
+<pre class="line-numbers language-pyhton"><code class="language-pyhton">#-----------------MRE
+loss = tf.reduce_mean(tf.square(y_ture - y_pred)) #MSE
+#----------------交叉熵
+loss = tf.nn.sigmod_cross_entropy_with_logits(lables = y_ture , logits = y_pred)
+loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ol start="3">
+<li><p>接下来需要明白如何最小化损失函数，一般使用<strong>梯度下降法</strong>，尽管可能陷入局部最优，但是一般都是足够好的。</p>
+</li>
+<li><p>由于计算整个样本集合可能会很慢，所以需要使用一些采样方法，对样本的子集进行采样，一般规模在50~500个一次，过小的样本会使得硬件利用率降低，而且会使得<strong>目标函数</strong>产生较大的波动，但有时波动也是有益的，因为能够使得参数跳跃到新的局部最优值，TF中通过向图中添加新的操作然后使用自动差分来计算梯度，需要设置的就是学习率，来确定每次更新迭代的量，一般更倾向于设置较小的学习率，以防止跳过了局部最优解，但过低会导致损失函数减少的十分慢。</p>
+</li>
+</ol>
+<pre class="line-numbers language-python"><code class="language-python">optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>GradientDsecentOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
+train <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>loss<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h2 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h2><p>使用numpy生成数据，创建了三个特征向量样本，每个样本内积乘以一组权重加上偏差项再加上噪声得出结果，通过优化模型找到最佳参数</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1 <span class="token keyword">as</span> tf
+tf<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
+x_data <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">2000</span> <span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+w_real <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.3</span> <span class="token punctuation">,</span> <span class="token number">0.5</span> <span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">]</span>
+b_real <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">0.2</span>
+
+noise <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2000</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">0.1</span>
+y_data <span class="token operator">=</span> np<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>w_real <span class="token punctuation">,</span> x_data<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token operator">+</span> b_real <span class="token operator">+</span> noise
+<span class="token comment" spellcheck="true">#生成数据</span>
+NUM_STEPS <span class="token operator">=</span> <span class="token number">11</span>
+wb <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+g <span class="token operator">=</span> tf<span class="token punctuation">.</span>Graph<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">with</span> g<span class="token punctuation">.</span>as_default<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    y_true <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span>shape<span class="token operator">=</span>None<span class="token punctuation">)</span>
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'inference'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
+        w <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> dtype <span class="token operator">=</span> tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> name <span class="token operator">=</span> <span class="token string">'weights'</span><span class="token punctuation">)</span>
+        b <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span><span class="token number">0</span> <span class="token punctuation">,</span> dtype <span class="token operator">=</span> tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> name <span class="token operator">=</span> <span class="token string">'bias'</span><span class="token punctuation">)</span>
+        y_pred <span class="token operator">=</span> tf<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>w <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>transpose<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> b
+
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'loss'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
+        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>square<span class="token punctuation">(</span>y_true <span class="token operator">-</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'train'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
+        learning_rate <span class="token operator">=</span> <span class="token number">0.5</span>
+        optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>GradientDescentOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
+        train <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>loss<span class="token punctuation">)</span>
+
+    init <span class="token operator">=</span> tf<span class="token punctuation">.</span>global_variables_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sess<span class="token punctuation">:</span>
+        sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>init<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> step <span class="token keyword">in</span> range<span class="token punctuation">(</span>NUM_STEPS<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>train<span class="token punctuation">,</span>feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x <span class="token punctuation">:</span>x_data <span class="token punctuation">,</span> y_true <span class="token punctuation">:</span> y_data<span class="token punctuation">}</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> step <span class="token operator">%</span> <span class="token number">5</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span>step <span class="token punctuation">,</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                wb<span class="token punctuation">.</span>append<span class="token punctuation">(</span>sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
             </div>
             <hr/>
@@ -693,8 +756,8 @@ sess<span class="token operator">=</span> tf<span class="token punctuation">.</s
                         
                             监督式学习指目标给定标签来进行分类等例如聚类，分类问题等
 无监督式学习指目标没有指定的标签，通过已有样本的特点来进行预测拟合，如回归分析
-线性回归
-代价函数(一般为平方差等，表示拟合量与实际值的偏差)通过寻找代价函数与目标函数参数关系寻找到
+构成
+代价函数(一般为平方差等，表示拟合量与实际值的偏差)通过寻找代价函数与目标函数参数关系寻找到最小
                         
                     </div>
                     <div class="publish-info">
