@@ -5,7 +5,7 @@
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
     <meta name="keywords" content="TensorFlow学习笔记, Wang5230">
-    <meta name="description" content="module ‘tensorflow’ has no attribute ‘Session’已修复在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytor">
+    <meta name="description" content="debugmodule ‘tensorflow’ has no attribute ‘Session’(已修复)在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
     <meta name="renderer" content="webkit|ie-stand|ie-comp">
@@ -422,7 +422,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-09-28
+                    2020-09-30
                 </div>
                 
 
@@ -439,7 +439,7 @@
         <hr class="clearfix">
         <div class="card-content article-card-content">
             <div id="articleContent">
-                <h2 id="module-‘tensorflow’-has-no-attribute-‘Session’"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’"></a>module ‘tensorflow’ has no attribute ‘Session’</h2><h3 id="已修复"><a href="#已修复" class="headerlink" title="已修复"></a>已修复</h3><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch</p>
+                <h2 id="debug"><a href="#debug" class="headerlink" title="debug"></a>debug</h2><h3 id="module-‘tensorflow’-has-no-attribute-‘Session’-已修复"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’-已修复" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’(已修复)"></a>module ‘tensorflow’ has no attribute ‘Session’(已修复)</h3><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
 tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
 config <span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>ConfigProto<span class="token punctuation">(</span>allow_soft_placement<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
@@ -469,7 +469,7 @@ loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><s
 </ol>
 <pre class="line-numbers language-python"><code class="language-python">optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>GradientDsecentOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
 train <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>loss<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h2 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h2><p>使用numpy生成数据，创建了三个特征向量样本，每个样本内积乘以一组权重加上偏差项再加上噪声得出结果，通过优化模型找到最佳参数</p>
+<h3 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h3><p>使用numpy生成数据，创建了三个特征向量样本，每个样本内积乘以一组权重加上偏差项再加上噪声得出结果，通过优化模型找到最佳参数</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
 <span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1 <span class="token keyword">as</span> tf
 tf<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
@@ -507,6 +507,12 @@ g <span class="token operator">=</span> tf<span class="token punctuation">.</spa
             <span class="token keyword">if</span> step <span class="token operator">%</span> <span class="token number">5</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
                 <span class="token keyword">print</span><span class="token punctuation">(</span>step <span class="token punctuation">,</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
                 wb<span class="token punctuation">.</span>append<span class="token punctuation">(</span>sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="逻辑回归"><a href="#逻辑回归" class="headerlink" title="逻辑回归"></a>逻辑回归</h3><p>一般用来进行二分类任务，输出一个0-1之间地离散二值结果，通过sigmoid函数来将数值映射到0到1之间，之后通过阈值分类器来将0到1之间的值转换为0或1，与之前代码的唯一不同是损失函数部分</p>
+<pre class="line-numbers language-pyhton"><code class="language-pyhton">with tf.name_scope('loss') as scope:
+loss = tf.nn.sigmoid_cross_entropy_with_logits(labels = y_true , logits = y_pred)
+loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="CNN"><a href="#CNN" class="headerlink" title="CNN"></a>CNN</h2><p>层中的神经元只与前一层中的一小块区域连接，而不是采取全连接方式，主要由输入层，卷积层，ReLU层，池化层和全连接层构成(一般将卷积层和ReLU层一起称为卷积层)具体说来，卷积层和全连接层（CONV/FC）对输入执行变换操作的时候，不仅会用到激活函数，还会用到很多参数，即神经元的权值w和偏差b；而ReLU层和池化层则是进行一个固定不变的函数操作。卷积层和全连接层中的参数会随着梯度下降被训练，这样卷积神经网络计算出的分类评分就能和训练集中的每个图像的标签吻合了。</p>
+<h3 id="卷积层"><a href="#卷积层" class="headerlink" title="卷积层"></a>卷积层</h3><p>参数由一些可学习的滤波器集合构成，只观察输入数据中的一小部分，由于卷积有“权值共享”这样的特性，可以降低参数的数量，防止参数过多造成过拟合。每个神经元连接的空间大小叫做神经元的感受野，深度与输入相同，但宽高是局部的。输出数据体和使用的滤波器的数量一致，将沿着深度方向排列。有时候在输入数据体的边缘使用0进行填充，使得滤波器可以平滑地在数据上滑动，一般是用来保持数据体的空间尺寸使输入输出宽高相同。如果在一个深度切片中的所有权重都使用同一个权重向量，那么卷积层的前向传播在每个深度切片中可以看做是在计算神经元权重和输入数据体的卷积（这就是“卷积层”名字由来）。这也是为什么总是将这些权重集合称为滤波器（filter）（或卷积核（kernel）），因为它们和输入进行了卷积。</p>
 
             </div>
             <hr/>
