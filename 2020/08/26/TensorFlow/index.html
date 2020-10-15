@@ -4,7 +4,7 @@
 
 <head><meta name="generator" content="Hexo 3.9.0">
     <meta charset="utf-8">
-    <meta name="keywords" content="TensorFlow学习笔记, Wang5230">
+    <meta name="keywords" content="TensorFlow1.x学习笔记, Wang5230">
     <meta name="description" content="debugmodule ‘tensorflow’ has no attribute ‘Session’(已修复)在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
@@ -13,7 +13,7 @@
     <meta name="format-detection" content="telephone=no">
     <meta name="apple-mobile-web-app-capable" content="yes">
     <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-    <title>TensorFlow学习笔记 | Wang5230</title>
+    <title>TensorFlow1.x学习笔记 | Wang5230</title>
     <link rel="icon" type="image/png" href="/favicon.png">
 
     <link rel="stylesheet" type="text/css" href="/libs/awesome/css/all.css">
@@ -283,13 +283,13 @@
 
 
 
-<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/21.jpg')">
+<div class="bg-cover pd-header post-cover" style="background-image: url('/medias/featureimages/10.jpg')">
     <div class="container" style="right: 0px;left: 0px;">
         <div class="row">
             <div class="col s12 m12 l12">
                 <div class="brand">
                     <div class="description center-align post-title">
-                        TensorFlow学习笔记
+                        TensorFlow1.x学习笔记
                     </div>
                 </div>
             </div>
@@ -422,7 +422,7 @@
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-10-05
+                    2020-10-15
                 </div>
                 
 
@@ -515,7 +515,8 @@ loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><s
 <h2 id="CNN"><a href="#CNN" class="headerlink" title="CNN"></a>CNN</h2><p>层中的神经元只与前一层中的一小块区域连接，而不是采取全连接方式，主要由输入层，卷积层，ReLU层，池化层和全连接层构成(一般将卷积层和ReLU层一起称为卷积层)具体说来，卷积层和全连接层（CONV/FC）对输入执行变换操作的时候，不仅会用到激活函数，还会用到很多参数，即神经元的权值w和偏差b；而ReLU层和池化层则是进行一个固定不变的函数操作。卷积层和全连接层中的参数会随着梯度下降被训练，这样卷积神经网络计算出的分类评分就能和训练集中的每个图像的标签吻合了。</p>
 <h3 id="卷积层"><a href="#卷积层" class="headerlink" title="卷积层"></a>卷积层</h3><p>参数由一些可学习的滤波器集合构成，只观察输入数据中的一小部分，由于卷积有“权值共享”这样的特性，可以降低参数的数量，防止参数过多造成过拟合。每个神经元连接的空间大小叫做神经元的感受野，深度与输入相同，但宽高是局部的。输出数据体和使用的滤波器的数量一致，将沿着深度方向排列。有时候在输入数据体的边缘使用0进行填充，使得滤波器可以平滑地在数据上滑动，一般是用来保持数据体的空间尺寸使输入输出宽高相同。如果在一个深度切片中的所有权重都使用同一个权重向量，那么卷积层的前向传播在每个深度切片中可以看做是在计算神经元权重和输入数据体的卷积（这就是“卷积层”名字由来）。这也是为什么总是将这些权重集合称为滤波器（filter）（或卷积核（kernel）），因为它们和输入进行了卷积。简单来说，就是一个在原始数据上以步长为长度不断移动的一个矩阵，层数与原始数据一致，将每个对应位置的数据进行乘积并且将每层的值相加，即为输出的一个数据，例如RGB通道下就是三层滤波器所得相加填入新的矩阵当中。</p>
 <h3 id="池化层"><a href="#池化层" class="headerlink" title="池化层"></a>池化层</h3><p>用来简化数据，减少计算量，有最大池化和平均池化，使用较多的是最大池化，通过找出某一个区域内的最大值/平均值来缩小数据，一般使用的参数是f=2，p=2 恰好为缩小数据为原来的一半，并且反向传播没有参数适用于池化，这一过程是静态过程，参数都是手动设定，或是交叉验证得到的，只用于简化数据，提取特征。</p>
-<h3 id="全连接层"><a href="#全连接层" class="headerlink" title="全连接层"></a>全连接层</h3><p>简单的卷积实现mnist识别</p>
+<h3 id="全连接层"><a href="#全连接层" class="headerlink" title="全连接层"></a>全连接层</h3><p>将池化层简化后的数据进行提取，将特征整合到一起，输出为一个值，主要作用是减小特征位置对于结果产生的影响，将结果进行分类，一般不止一层，需要将提取出来的特征神经元激活后，通过不同神经元激活的组合，再提取出结果</p>
+<p>简单的卷积实现mnist识别,将测试过程分为每个大小为1000幅图的十块</p>
 <pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1 <span class="token keyword">as</span> tf
 <span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
 <span class="token keyword">from</span> tensorflow<span class="token punctuation">.</span>examples<span class="token punctuation">.</span>tutorials<span class="token punctuation">.</span>mnist <span class="token keyword">import</span> input_data
@@ -578,6 +579,7 @@ accuracy <span class="token operator">=</span> tf<span class="token punctuation"
         Y <span class="token operator">=</span> minst<span class="token punctuation">.</span>test<span class="token punctuation">.</span>labels<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">1000</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span>
         test_accuracy <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">[</span>sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>accuracy <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>Y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">1.0</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
     <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"test accuracy: {}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>test_accuracy<span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ResNet"><a href="#ResNet" class="headerlink" title="ResNet"></a>ResNet</h3><p>深度残差网络（Deep residual network, ResNet）的提出是CNN图像史上的一件里程碑事件.通过引入残差学习的方法来解决网络在随着深度增加时出现的准确度饱和下降，梯度爆炸以及消失的难以训练的问题。对于一个堆积结构，在输入x时，学到的特征为H(x)，现在希望其学到残差即 H(x)-x,这样即使残差为0时，也仅是在层之间做了恒等映射，至少不会性能下降，残差使得其会在本有的特征上学习到新的特征，有点类似电路中的短路`</p>
 
             </div>
             <hr/>
