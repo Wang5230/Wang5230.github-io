@@ -688,33 +688,30 @@
 <article id="prenext-posts" class="prev-next articles">
     <div class="row article-row">
         
-        <div class="article col s12 m6" data-aos="fade-up" data-aos="fade-up">
+        <div class="article col s12 m6" data-aos="fade-up">
             <div class="article-badge left-badge text-color">
-                <i class="far fa-dot-circle"></i>&nbsp;本篇
-            </div>
+                <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2020/09/05/Machine_learing/">
+                <a href="/2020/10/29/batch-epoch-iteration/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="MachineLearning">
+                        <img src="/medias/featureimages/8.jpg" class="responsive-img" alt="batch,epoch,iteration">
                         
-                        <span class="card-title">MachineLearning</span>
+                        <span class="card-title">batch,epoch,iteration</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            监督式学习指目标给定标签来进行分类等例如聚类，分类问题等
-无监督式学习指目标没有指定的标签，通过已有样本的特点来进行预测拟合，如回归分析
-构成
-代价函数(一般为平方差等，表示拟合量与实际值的偏差)通过寻找代价函数与目标函数参数关系寻找到最小
+                            
+batch size：简单来说，batch size就是每次训练向模型中传入的数据量的多少，过小的话会导致梯度不明显，模型下降速度慢，过大的话尽管速度会更快但会导致需要更多的epoch来获得更好的结果，与batch本身的节约内存空间的目的
                         
                     </div>
                     <div class="publish-info">
-                            <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-09-05
-                            </span>
+                        <span class="publish-date">
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-10-29
+                        </span>
                         <span class="publish-author">
                             
                             <i class="fas fa-user fa-fw"></i>
@@ -723,12 +720,15 @@
                         </span>
                     </div>
                 </div>
-
                 
                 <div class="card-action article-tags">
                     
                     <a href="/tags/python/">
                         <span class="chip bg-color">python</span>
+                    </a>
+                    
+                    <a href="/tags/machinelearning/">
+                        <span class="chip bg-color">machinelearning</span>
                     </a>
                     
                 </div>
@@ -742,21 +742,19 @@
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/08/26/Tensorflow2.x学习笔记/">
+                <a href="/2020/08/26/TensorFlow/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="TensorFlow2.x学习笔记">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="TensorFlow1.x学习笔记">
                         
-                        <span class="card-title">TensorFlow2.x学习笔记</span>
+                        <span class="card-title">TensorFlow1.x学习笔记</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            基础创建变量等操作与1.x基本类似，但可以进行即时执行模式，与之前的图执行模式不同，语法更精炼简单。
-num_epoch = 100000
-optimizer = tf.keras.optimizers.SGD(learning_rate 
+                            debugmodule ‘tensorflow’ has no attribute ‘Session’(已修复)在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法
                         
                     </div>
                     <div class="publish-info">
@@ -776,10 +774,6 @@ optimizer = tf.keras.optimizers.SGD(learning_rate
                     
                     <a href="/tags/python/">
                         <span class="chip bg-color">python</span>
-                    </a>
-                    
-                    <a href="/tags/machinelearning/">
-                        <span class="chip bg-color">machinelearning</span>
                     </a>
                     
                 </div>

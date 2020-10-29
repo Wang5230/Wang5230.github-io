@@ -428,7 +428,7 @@ optimizer = tf.keras.optimizers.SGD(learning_rate ">
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-10-19
+                    2020-10-29
                 </div>
                 
 
@@ -446,14 +446,14 @@ optimizer = tf.keras.optimizers.SGD(learning_rate ">
         <div class="card-content article-card-content">
             <div id="articleContent">
                 <h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><p>创建变量等操作与1.x基本类似，但可以进行即时执行模式，与之前的图执行模式不同，语法更精炼简单。</p>
-<pre class="line-numbers language-pyhton"><code class="language-pyhton">num_epoch = 100000
-optimizer = tf.keras.optimizers.SGD(learning_rate = 5e-4)
-for e in range(num_epoch):
-    with tf.GradientTape() as tape:
-        y_pred = a * x + b
-        loss = tf.reduce_sum(tf.square(y - y_pred))
-    grads = tape.gradient(loss , variables)
-    optimizer.apply_gradients(grads_and_vars = zip(grads , variables))<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<pre class="line-numbers language-python"><code class="language-python">num_epoch <span class="token operator">=</span> <span class="token number">100000</span>
+optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>optimizers<span class="token punctuation">.</span>SGD<span class="token punctuation">(</span>learning_rate <span class="token operator">=</span> <span class="token number">5e</span><span class="token operator">-</span><span class="token number">4</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> e <span class="token keyword">in</span> range<span class="token punctuation">(</span>num_epoch<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>GradientTape<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> tape<span class="token punctuation">:</span>
+        y_pred <span class="token operator">=</span> a <span class="token operator">*</span> x <span class="token operator">+</span> b
+        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_sum<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>square<span class="token punctuation">(</span>y <span class="token operator">-</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">)</span>
+    grads <span class="token operator">=</span> tape<span class="token punctuation">.</span>gradient<span class="token punctuation">(</span>loss <span class="token punctuation">,</span> variables<span class="token punctuation">)</span>
+    optimizer<span class="token punctuation">.</span>apply_gradients<span class="token punctuation">(</span>grads_and_vars <span class="token operator">=</span> zip<span class="token punctuation">(</span>grads <span class="token punctuation">,</span> variables<span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>可以直接调用GradientTape来进行梯度以及导数计算。上面的代码中声明了一个梯度下降优化器，可以通过计算的求导结果更新模型参数，从而最小化某个特定的损失函数，通过apply_gradients()方法来进行调用，函数内的参数为需要更新的变量以及损失函数关于该变量的偏导数。需要传入一个列表，每个元素为(偏导，变量)。</p>
 <h2 id="模型与层"><a href="#模型与层" class="headerlink" title="模型与层"></a>模型与层</h2><p>使用TF内置的库Keras来进行模型的构建。<br>Keras里有两个重要的概念：<strong>层(Layer)</strong>和<strong>模型(model)</strong>,层将各种计算流程和变量进行了封装(全连接层，卷积层，池化层等)，模型则用于各种层进行连接。模型通过类的形式呈现，所以可以通过继承tf.keras.Model来定义自己的模型，需要重写<strong>init</strong>()和call(),继承模型后可以调用模型中的方法和属性。可以大量简化代码,下面是通过模型的方式编写的一个简单的线性回归，可以看出在进行计算处理部分与之前基本一致，但是关于模型变量的访问，以及模型初始化都方便了许多。通过在模型内部实例化了一个全连接层，并对其在call()中进行调用</p>
 <pre class="line-numbers language-python"><code class="language-python">X <span class="token operator">=</span> tf<span class="token punctuation">.</span>constant<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token number">2.0</span><span class="token punctuation">,</span> <span class="token number">3.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">4.0</span><span class="token punctuation">,</span> <span class="token number">5.0</span><span class="token punctuation">,</span> <span class="token number">6.0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
@@ -480,7 +480,34 @@ optimizer <span class="token operator">=</span> tf<span class="token punctuation
     grads <span class="token operator">=</span> tape<span class="token punctuation">.</span>gradient<span class="token punctuation">(</span>loss <span class="token punctuation">,</span> model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span>
     optimizer<span class="token punctuation">.</span>apply_gradients<span class="token punctuation">(</span>grads_and_vars <span class="token operator">=</span> zip<span class="token punctuation">(</span>grads <span class="token punctuation">,</span> model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span><span class="token punctuation">)</span>
 <span class="token keyword">print</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>全连接层(Dense)是最常用的层之一，对输入矩阵进行f(AW+b)的线性变换+激活函数操作，激活函数一般是Relu等等.包含的参数如下<br>    -  units 输出张量的维度<br>    -  activation 激活函数 不指定时为f(x) = x<br>    -  use_bias 添加偏置，默认为True<br>    -  kernel_initializer,bias_initializer 权重，偏置的初始化器，默认为glort_uniform_initializer(很多层都默认使用)，使用ezeros_initializer表示初始化为0。</p>
+<p><strong>全连接层(Dense)</strong> 是最常用的层之一，对输入矩阵进行f(AW+b)的线性变换+激活函数操作，激活函数一般是Relu等等.包含的参数如下</p>
+<ul>
+<li>units 输出张量的维度</li>
+<li>activation 激活函数 不指定时为f(x) = x</li>
+<li>use_bias 添加偏置，默认为True</li>
+<li>kernel_initializer,bias_initializer 权重，偏置的初始化器，默认为glort_uniform_initializer(很多层都默认使用)，使用ezeros_initializer表示初始化为0</li>
+</ul>
+<p><strong>softmax函数</strong>为了使得模型的输出能始终满足这两个条件，我们使用 Softmax 函数 （归一化指数函数， tf.nn.softmax ）对模型的原始输出进行归一化 。不仅如此，softmax 函数能够凸显原始向量中最大的值，并抑制远低于最大值的其他分量，这也是该函数被称作 softmax 函数的原因（即平滑化的 argmax 函数）。</p>
+<h3 id="模型的训练"><a href="#模型的训练" class="headerlink" title="模型的训练"></a>模型的训练</h3><p>tf.keras.losses 和 tf.keras.optimizer<br>需要定义一些模型超参数</p>
+<ul>
+<li><p>num_epochs = 5</p>
+</li>
+<li><p>batch_size = 50</p>
+</li>
+<li><p>learning_rate = 0.001<br>之后实例化模型和优化器，迭代进行数据的读取以及模型的训练步骤如下</p>
+</li>
+<li><p>从 DataLoader 中随机取一批训练数据；</p>
+</li>
+<li><p>将这批数据送入模型，计算出模型的预测值；</p>
+</li>
+<li><p>将模型预测值与真实值进行比较，计算损失函数（loss）。这里使用 tf.keras.losses 中的交叉熵函数作为损失函数</p>
+</li>
+<li><p>计算损失函数关于模型变量的导数；</p>
+</li>
+<li><p>将求出的导数值传入优化器，使用优化器的 apply_gradients 方法更新模型参数以最小化损失函数</p>
+</li>
+</ul>
+<h3 id="模型的评估"><a href="#模型的评估" class="headerlink" title="模型的评估"></a>模型的评估</h3><p>使用tf.keras.metrics中的SparseCategoricalAccuracy来评估模型在测试集上的性能，通过将预测结果与真是结果相比较，输出正确的占比。通过update_state()方法向评估器输入预测值和真实值。其内部有变量来保存当前评估的指标的数值，最终通过result()方法输出最终评估值。</p>
 
             </div>
             <hr/>
@@ -720,27 +747,24 @@ optimizer <span class="token operator">=</span> tf<span class="token punctuation
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2020/09/05/Machine_learing/">
+                <a href="/2020/08/26/TensorFlow/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="MachineLearning">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="TensorFlow1.x学习笔记">
                         
-                        <span class="card-title">MachineLearning</span>
+                        <span class="card-title">TensorFlow1.x学习笔记</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            监督式学习指目标给定标签来进行分类等例如聚类，分类问题等
-无监督式学习指目标没有指定的标签，通过已有样本的特点来进行预测拟合，如回归分析
-构成
-代价函数(一般为平方差等，表示拟合量与实际值的偏差)通过寻找代价函数与目标函数参数关系寻找到最小
+                            debugmodule ‘tensorflow’ has no attribute ‘Session’(已修复)在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-09-05
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-08-26
                         </span>
                         <span class="publish-author">
                             
@@ -768,24 +792,34 @@ optimizer <span class="token operator">=</span> tf<span class="token punctuation
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2020/08/26/TensorFlow/">
+                <a href="/2019/12/26/Mybatis/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="TensorFlow1.x学习笔记">
+                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="Mybatis">
                         
-                        <span class="card-title">TensorFlow1.x学习笔记</span>
+                        <span class="card-title">Mybatis</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            debugmodule ‘tensorflow’ has no attribute ‘Session’(已修复)在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法
+                            框架
+框架的概念:软件开发中的一套解决方案，不同方案可以解决不同的问题，封装了许多的细节，可以使开发效率大幅度提高。
+三层架构：
+表现层：数据的展示
+业务层：处理业务需求
+持久层：与数据库交互
+
+
+持久层的技术解决方案
+JDBC技术
+Con
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2020-08-26
+                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-26
                             </span>
                         <span class="publish-author">
                             
@@ -798,8 +832,8 @@ optimizer <span class="token operator">=</span> tf<span class="token punctuation
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/python/">
-                        <span class="chip bg-color">python</span>
+                    <a href="/tags/java/">
+                        <span class="chip bg-color">java</span>
                     </a>
                     
                 </div>
