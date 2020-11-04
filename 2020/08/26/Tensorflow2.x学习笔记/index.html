@@ -428,7 +428,7 @@ optimizer = tf.keras.optimizers.SGD(learning_rate ">
                 
                 <div class="post-date info-break-policy">
                     <i class="far fa-calendar-check fa-fw"></i>更新日期:&nbsp;&nbsp;
-                    2020-10-29
+                    2020-11-04
                 </div>
                 
 
@@ -508,6 +508,144 @@ optimizer <span class="token operator">=</span> tf<span class="token punctuation
 </li>
 </ul>
 <h3 id="模型的评估"><a href="#模型的评估" class="headerlink" title="模型的评估"></a>模型的评估</h3><p>使用tf.keras.metrics中的SparseCategoricalAccuracy来评估模型在测试集上的性能，通过将预测结果与真是结果相比较，输出正确的占比。通过update_state()方法向评估器输入预测值和真实值。其内部有变量来保存当前评估的指标的数值，最终通过result()方法输出最终评估值。</p>
+<h3 id="代码汇总"><a href="#代码汇总" class="headerlink" title="代码汇总"></a>代码汇总</h3><pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
+<span class="token comment" spellcheck="true">#CNN with keras</span>
+<span class="token keyword">class</span> <span class="token class-name">CNN</span><span class="token punctuation">(</span>tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>Model<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        super<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>conv1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Conv2D<span class="token punctuation">(</span>
+            filters<span class="token operator">=</span><span class="token number">32</span><span class="token punctuation">,</span>             <span class="token comment" spellcheck="true"># 卷积层神经元（卷积核）数目</span>
+            kernel_size<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true"># 感受野大小</span>
+            padding<span class="token operator">=</span><span class="token string">'same'</span><span class="token punctuation">,</span>         <span class="token comment" spellcheck="true"># padding策略（vaild 或 same）</span>
+            activation<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu   <span class="token comment" spellcheck="true"># 激活函数</span>
+        <span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>pool1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>MaxPool2D<span class="token punctuation">(</span>pool_size<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> strides<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>conv2 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Conv2D<span class="token punctuation">(</span>
+            filters<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">,</span>
+            kernel_size<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
+            padding<span class="token operator">=</span><span class="token string">'same'</span><span class="token punctuation">,</span>
+            activation<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu
+        <span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>pool2 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>MaxPool2D<span class="token punctuation">(</span>pool_size<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> strides<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>flatten <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Reshape<span class="token punctuation">(</span>target_shape<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">7</span> <span class="token operator">*</span> <span class="token number">7</span> <span class="token operator">*</span> <span class="token number">64</span><span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>dense1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">1024</span><span class="token punctuation">,</span> activation<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">)</span>
+        self<span class="token punctuation">.</span>dense2 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">def</span> <span class="token function">call</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> inputs<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        x <span class="token operator">=</span> self<span class="token punctuation">.</span>conv1<span class="token punctuation">(</span>inputs<span class="token punctuation">)</span>                  <span class="token comment" spellcheck="true"># [batch_size, 28, 28, 32]</span>
+        x <span class="token operator">=</span> self<span class="token punctuation">.</span>pool1<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                       <span class="token comment" spellcheck="true"># [batch_size, 14, 14, 32]</span>
+        x <span class="token operator">=</span> self<span class="token punctuation">.</span>conv2<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                       <span class="token comment" spellcheck="true"># [batch_size, 14, 14, 64]</span>
+        x <span class="token operator">=</span> self<span class="token punctuation">.</span>pool2<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                       <span class="token comment" spellcheck="true"># [batch_size, 7, 7, 64]</span>
+        x <span class="token operator">=</span> self<span class="token punctuation">.</span>flatten<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                     <span class="token comment" spellcheck="true"># [batch_size, 7 * 7 * 64]</span>
+        x <span class="token operator">=</span> self<span class="token punctuation">.</span>dense1<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                      <span class="token comment" spellcheck="true"># [batch_size, 1024]</span>
+        x <span class="token operator">=</span> self<span class="token punctuation">.</span>dense2<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                      <span class="token comment" spellcheck="true"># [batch_size, 10]</span>
+        output <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>softmax<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> output
+<span class="token comment" spellcheck="true"># MNISTLoader and MLP</span>
+<span class="token keyword">class</span> <span class="token class-name">MNISTLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        mnist <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>datasets<span class="token punctuation">.</span>mnist
+        <span class="token punctuation">(</span>self<span class="token punctuation">.</span>train_data<span class="token punctuation">,</span> self<span class="token punctuation">.</span>train_label<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>self<span class="token punctuation">.</span>test_data<span class="token punctuation">,</span> self<span class="token punctuation">.</span>test_label<span class="token punctuation">)</span> <span class="token operator">=</span> mnist<span class="token punctuation">.</span>load_data<span class="token punctuation">(</span><span class="token punctuation">)</span>
+        <span class="token comment" spellcheck="true"># MNIST中的图像默认为uint8（0-255的数字）。以下代码将其归一化到0-1之间的浮点数，并在最后增加一维作为颜色通道</span>
+        self<span class="token punctuation">.</span>train_data <span class="token operator">=</span> np<span class="token punctuation">.</span>expand_dims<span class="token punctuation">(</span>self<span class="token punctuation">.</span>train_data<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">255.0</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># [60000, 28, 28, 1]</span>
+        self<span class="token punctuation">.</span>test_data <span class="token operator">=</span> np<span class="token punctuation">.</span>expand_dims<span class="token punctuation">(</span>self<span class="token punctuation">.</span>test_data<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">255.0</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>        <span class="token comment" spellcheck="true"># [10000, 28, 28, 1]</span>
+        self<span class="token punctuation">.</span>train_label <span class="token operator">=</span> self<span class="token punctuation">.</span>train_label<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>int32<span class="token punctuation">)</span>    <span class="token comment" spellcheck="true"># [60000]</span>
+        self<span class="token punctuation">.</span>test_label <span class="token operator">=</span> self<span class="token punctuation">.</span>test_label<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>int32<span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># [10000]</span>
+        self<span class="token punctuation">.</span>num_train_data<span class="token punctuation">,</span> self<span class="token punctuation">.</span>num_test_data <span class="token operator">=</span> self<span class="token punctuation">.</span>train_data<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span>test_data<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
+
+    <span class="token keyword">def</span> <span class="token function">get_batch</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> batch_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token comment" spellcheck="true"># 从数据集中随机取出batch_size个元素并返回</span>
+        index <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randint<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span>num_train_data<span class="token punctuation">,</span> batch_size<span class="token punctuation">)</span>
+        <span class="token keyword">return</span> self<span class="token punctuation">.</span>train_data<span class="token punctuation">[</span>index<span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span>train_label<span class="token punctuation">[</span>index<span class="token punctuation">]</span>
+
+
+
+
+<span class="token comment" spellcheck="true"># class MLP(tf.keras.Model):</span>
+<span class="token comment" spellcheck="true">#     def __init__(self, *args, **kwargs):</span>
+<span class="token comment" spellcheck="true">#         super().__init__(*args, **kwargs)</span>
+<span class="token comment" spellcheck="true">#         self._flatten = tf.keras.layers.Flatten()</span>
+<span class="token comment" spellcheck="true">#         self.dense1 = tf.keras.layers.Dense(units=100 , activation = tf.nn.relu)</span>
+<span class="token comment" spellcheck="true">#         self.dense2 = tf.keras.layers.Dense(units=10)</span>
+<span class="token comment" spellcheck="true">#     def call(self, inputs):</span>
+<span class="token comment" spellcheck="true">#         x = self._flatten(inputs)</span>
+<span class="token comment" spellcheck="true">#         x = self.dense1(x)</span>
+<span class="token comment" spellcheck="true">#         x = self.dense2(x)</span>
+<span class="token comment" spellcheck="true">#         output = tf.nn.softmax(x)</span>
+<span class="token comment" spellcheck="true">#         return output</span>
+num_epochs <span class="token operator">=</span> <span class="token number">5</span>
+batch_size <span class="token operator">=</span> <span class="token number">50</span>
+learning_rate <span class="token operator">=</span> <span class="token number">0.001</span>
+model <span class="token operator">=</span> CNN<span class="token punctuation">(</span><span class="token punctuation">)</span>
+data_loader <span class="token operator">=</span> MNISTLoader<span class="token punctuation">(</span><span class="token punctuation">)</span>
+optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>optimizers<span class="token punctuation">.</span>Adam<span class="token punctuation">(</span>learning_rate <span class="token operator">=</span> learning_rate<span class="token punctuation">)</span>
+num_batches <span class="token operator">=</span> int<span class="token punctuation">(</span>data_loader<span class="token punctuation">.</span>num_train_data <span class="token operator">//</span> batch_size <span class="token operator">*</span> num_epochs<span class="token punctuation">)</span>
+<span class="token keyword">for</span> batch_index <span class="token keyword">in</span> range<span class="token punctuation">(</span>num_batches<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    X <span class="token punctuation">,</span> y <span class="token operator">=</span> data_loader<span class="token punctuation">.</span>get_batch<span class="token punctuation">(</span>batch_size<span class="token punctuation">)</span>
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>GradientTape<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> tape<span class="token punctuation">:</span>
+        y_pred <span class="token operator">=</span> model<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>losses<span class="token punctuation">.</span>sparse_categorical_crossentropy<span class="token punctuation">(</span>y_true<span class="token operator">=</span>y <span class="token punctuation">,</span> y_pred<span class="token operator">=</span>y_pred<span class="token punctuation">)</span>
+        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>loss<span class="token punctuation">)</span>
+        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"batch %d: loss %f"</span><span class="token operator">%</span><span class="token punctuation">(</span>batch_index <span class="token punctuation">,</span> loss<span class="token punctuation">.</span>numpy<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+    grads <span class="token operator">=</span> tape<span class="token punctuation">.</span>gradient<span class="token punctuation">(</span>loss <span class="token punctuation">,</span> model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span>
+    optimizer<span class="token punctuation">.</span>apply_gradients<span class="token punctuation">(</span>grads_and_vars <span class="token operator">=</span> zip<span class="token punctuation">(</span>grads <span class="token punctuation">,</span> model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span><span class="token punctuation">)</span>
+sparse_categorical_accuracy <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>SparseCategoricalAccuracy<span class="token punctuation">(</span><span class="token punctuation">)</span>
+num_batches <span class="token operator">=</span> int<span class="token punctuation">(</span>data_loader<span class="token punctuation">.</span>num_test_data <span class="token operator">//</span> batch_size<span class="token punctuation">)</span>
+<span class="token keyword">for</span> batch_index <span class="token keyword">in</span> range<span class="token punctuation">(</span>num_batches<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    start_index <span class="token punctuation">,</span> end_index <span class="token operator">=</span> batch_index <span class="token operator">*</span> batch_size <span class="token punctuation">,</span> <span class="token punctuation">(</span>batch_index <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">*</span> batch_size
+    y_pred <span class="token operator">=</span> model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>data_loader<span class="token punctuation">.</span>test_data<span class="token punctuation">[</span>start_index <span class="token punctuation">:</span> end_index<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    sparse_categorical_accuracy<span class="token punctuation">.</span>update_state<span class="token punctuation">(</span>y_true <span class="token operator">=</span> data_loader<span class="token punctuation">.</span>test_label<span class="token punctuation">[</span>start_index <span class="token punctuation">:</span> end_index<span class="token punctuation">]</span> <span class="token punctuation">,</span> y_pred<span class="token operator">=</span> y_pred<span class="token punctuation">)</span>
+<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"test accuracy : %f"</span><span class="token operator">%</span>sparse_categorical_accuracy<span class="token punctuation">.</span>result<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token comment" spellcheck="true">#using Model for linear regression</span>
+<span class="token comment" spellcheck="true"># X = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])</span>
+<span class="token comment" spellcheck="true"># y = tf.constant([[10.0], [20.0]])</span>
+
+<span class="token comment" spellcheck="true"># class Linear(tf.keras.Model):</span>
+<span class="token comment" spellcheck="true">#     def __init__(self):</span>
+<span class="token comment" spellcheck="true">#         super().__init__()</span>
+<span class="token comment" spellcheck="true">#         self.dense = tf.keras.layers.Dense(</span>
+<span class="token comment" spellcheck="true">#             units = 1,</span>
+<span class="token comment" spellcheck="true">#             activation=None,</span>
+<span class="token comment" spellcheck="true">#             kernel_initializer = tf.zeros_initializer(),</span>
+<span class="token comment" spellcheck="true">#             bias_initializer = tf.zeros_initializer()</span>
+<span class="token comment" spellcheck="true">#         )</span>
+<span class="token comment" spellcheck="true">#     def call(self , input):</span>
+<span class="token comment" spellcheck="true">#         output = self.dense(input)</span>
+<span class="token comment" spellcheck="true">#         return output</span>
+<span class="token comment" spellcheck="true"># model = Linear()</span>
+<span class="token comment" spellcheck="true"># optimizer = tf.keras.optimizers.SGD(lr=0.01)</span>
+<span class="token comment" spellcheck="true"># for i in range(100):</span>
+<span class="token comment" spellcheck="true">#     with tf.GradientTape() as tape:</span>
+<span class="token comment" spellcheck="true">#         y_pred = model(X)</span>
+<span class="token comment" spellcheck="true">#         print(model.variables)</span>
+<span class="token comment" spellcheck="true">#         loss = tf.reduce_mean(tf.square(y_pred - y))</span>
+<span class="token comment" spellcheck="true">#     grads = tape.gradient(loss , model.variables)</span>
+<span class="token comment" spellcheck="true">#     optimizer.apply_gradients(grads_and_vars = zip(grads , model.variables))</span>
+<span class="token comment" spellcheck="true"># print(model.variables)</span>
+<span class="token comment" spellcheck="true"># 1st the linear regression</span>
+<span class="token comment" spellcheck="true"># X_raw = np.array([2013, 2014, 2015, 2016, 2017], dtype=np.float32)</span>
+<span class="token comment" spellcheck="true"># y_raw = np.array([12000, 14000, 15000, 16500, 17500], dtype=np.float32)</span>
+
+<span class="token comment" spellcheck="true"># x = (X_raw - X_raw.min()) / (X_raw.max() - X_raw.min())</span>
+<span class="token comment" spellcheck="true"># y = (y_raw - y_raw.min()) / (y_raw.max() - y_raw.min())</span>
+
+<span class="token comment" spellcheck="true"># x = tf.constant(x)</span>
+<span class="token comment" spellcheck="true"># y = tf.constant(y)</span>
+
+<span class="token comment" spellcheck="true"># a = tf.Variable(initial_value = 0.)</span>
+<span class="token comment" spellcheck="true"># b = tf.Variable(initial_value = 0 , dtype = tf.float32)</span>
+<span class="token comment" spellcheck="true"># variables = [a,b]</span>
+
+<span class="token comment" spellcheck="true"># num_epoch = 100000</span>
+<span class="token comment" spellcheck="true"># optimizer = tf.keras.optimizers.SGD(learning_rate = 5e-4)</span>
+<span class="token comment" spellcheck="true"># for e in range(num_epoch):</span>
+<span class="token comment" spellcheck="true">#     with tf.GradientTape() as tape:</span>
+<span class="token comment" spellcheck="true">#         y_pred = a * x + b</span>
+<span class="token comment" spellcheck="true">#         loss = tf.reduce_sum(tf.square(y - y_pred))</span>
+<span class="token comment" spellcheck="true">#     grads = tape.gradient(loss , variables)</span>
+<span class="token comment" spellcheck="true">#     optimizer.apply_gradients(grads_and_vars = zip(grads , variables))</span>
+<span class="token comment" spellcheck="true"># print(a,b)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 
             </div>
             <hr/>
@@ -747,24 +885,27 @@ optimizer <span class="token operator">=</span> tf<span class="token punctuation
             <div class="article-badge left-badge text-color">
                 <i class="fas fa-chevron-left"></i>&nbsp;上一篇</div>
             <div class="card">
-                <a href="/2020/08/26/TensorFlow/">
+                <a href="/2020/09/05/Machine_learing/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="TensorFlow1.x学习笔记">
+                        <img src="/medias/featureimages/11.jpg" class="responsive-img" alt="MachineLearning">
                         
-                        <span class="card-title">TensorFlow1.x学习笔记</span>
+                        <span class="card-title">MachineLearning</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            debugmodule ‘tensorflow’ has no attribute ‘Session’(已修复)在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法
+                            监督式学习指目标给定标签来进行分类等例如聚类，分类问题等
+无监督式学习指目标没有指定的标签，通过已有样本的特点来进行预测拟合，如回归分析
+构成
+代价函数(一般为平方差等，表示拟合量与实际值的偏差)通过寻找代价函数与目标函数参数关系寻找到最小
                         
                     </div>
                     <div class="publish-info">
                         <span class="publish-date">
-                            <i class="far fa-clock fa-fw icon-date"></i>2020-08-26
+                            <i class="far fa-clock fa-fw icon-date"></i>2020-09-05
                         </span>
                         <span class="publish-author">
                             
@@ -792,34 +933,24 @@ optimizer <span class="token operator">=</span> tf<span class="token punctuation
                 下一篇&nbsp;<i class="fas fa-chevron-right"></i>
             </div>
             <div class="card">
-                <a href="/2019/12/26/Mybatis/">
+                <a href="/2020/08/26/TensorFlow/">
                     <div class="card-image">
                         
                         
-                        <img src="/medias/featureimages/5.jpg" class="responsive-img" alt="Mybatis">
+                        <img src="/medias/featureimages/10.jpg" class="responsive-img" alt="TensorFlow1.x学习笔记">
                         
-                        <span class="card-title">Mybatis</span>
+                        <span class="card-title">TensorFlow1.x学习笔记</span>
                     </div>
                 </a>
                 <div class="card-content article-content">
                     <div class="summary block-with-text">
                         
-                            框架
-框架的概念:软件开发中的一套解决方案，不同方案可以解决不同的问题，封装了许多的细节，可以使开发效率大幅度提高。
-三层架构：
-表现层：数据的展示
-业务层：处理业务需求
-持久层：与数据库交互
-
-
-持久层的技术解决方案
-JDBC技术
-Con
+                            debugmodule ‘tensorflow’ has no attribute ‘Session’(已修复)在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法
                         
                     </div>
                     <div class="publish-info">
                             <span class="publish-date">
-                                <i class="far fa-clock fa-fw icon-date"></i>2019-12-26
+                                <i class="far fa-clock fa-fw icon-date"></i>2020-08-26
                             </span>
                         <span class="publish-author">
                             
@@ -832,8 +963,8 @@ Con
                 
                 <div class="card-action article-tags">
                     
-                    <a href="/tags/java/">
-                        <span class="chip bg-color">java</span>
+                    <a href="/tags/python/">
+                        <span class="chip bg-color">python</span>
                     </a>
                     
                 </div>
