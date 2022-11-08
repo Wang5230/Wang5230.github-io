@@ -56,6 +56,70 @@
   <article class="post">
       
         
+          <h1><a href="/2022/09/25/WRF学习/">WRF学习</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <h2 id="debug"><a href="#debug" class="headerlink" title="debug"></a>debug</h2><h3 id="1"><a href="#1" class="headerlink" title="1"></a>1</h3><p>在运行 <strong>./geogrid.exe</strong> 出现cannot open shared object file:libifport.so.5 No such file or directory，通过在环境变量中增加寻找动态链接库方法解决未果，通过搜索发现有人说在适用intel编译器(或ia32)，应该总输入 <strong>source /opt/intel/bin/compilervars.sh intel64</strong></p>
+<h3 id="2"><a href="#2" class="headerlink" title="2"></a>2</h3>
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
+          <h1><a href="/2022/09/22/Fortran学习/">Fortran学习</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <h1 id="baisc语法"><a href="#baisc语法" class="headerlink" title="baisc语法"></a>baisc语法</h1><h2 id="基本构成"><a href="#基本构成" class="headerlink" title="基本构成"></a>基本构成</h2><p>fortran程序由一组程序单元组成，每个包含一个主程序，语法如下</p>
+<pre class="line-numbers language-fortran"><code class="language-fortran"><span class="token keyword">program</span> program_name
+<span class="token keyword">implicit none</span>
+<span class="token keyword">end program</span> program_name<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="命名以及字符集"><a href="#命名以及字符集" class="headerlink" title="命名以及字符集"></a>命名以及字符集</h2><p>与C语言所包含的ASCII字符集基本相同，标识符即变量名称不区分大小写，且第一个字符必须是字母</p>
+<h2 id="关键字"><a href="#关键字" class="headerlink" title="关键字"></a>关键字</h2><p><a href="https://wenku.baidu.com/view/08bea464cfbff121dd36a32d7375a417866fc109.html" target="_blank" rel="noopener">https://wenku.baidu.com/view/08bea464cfbff121dd36a32d7375a417866fc109.html</a></p>
+<h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><p>分为了5种包括整数，浮点数，复杂数，布尔类型，字符类型</p>
+<ol>
+<li>整数(integer)与C语言中的int类似，仅保存整数</li>
+<li>浮点数(real)默认类型为双精度浮点数，可通过<strong>kind</strong>函数对其以及整数进行精度控制，对整数是控制其所占字节大小，通过<strong>huge</strong>函数可以得到某一整数变量的最大值</li>
+<li>复杂类型(complex)用于存储复数，赋值有两种方式，无论输入参数如何，其实部和虚部均为单精度</li>
+</ol>
+<pre class="line-numbers language-fortran"><code class="language-fortran"><span class="token keyword">complex</span> <span class="token operator">::</span> cx
+cx <span class="token operator">=</span> <span class="token punctuation">(</span><span class="token number">1.0</span> <span class="token punctuation">,</span> <span class="token number">2.0</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">! cx = 1+2i</span>
+cx <span class="token operator">=</span> cmplx<span class="token punctuation">(</span><span class="token number">2.0</span> <span class="token punctuation">,</span> <span class="token number">1.0</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">! cx = 2+i</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<ol start="4">
+<li>字符类型(character)用于存储字符串，通过<strong>len</strong>声明其长度</li>
+</ol>
+<pre class="line-numbers language-fortran"><code class="language-fortran"><span class="token keyword">character</span><span class="token punctuation">(</span>len <span class="token operator">=</span> <span class="token number">10</span><span class="token punctuation">)</span> <span class="token operator">::</span> name <span class="token comment" spellcheck="true">!声明了一个长度为40，名称为name的字符串</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ol start="5">
+<li><p>逻辑类型(logical)用于存储逻辑布尔值</p>
+</li>
+<li><p>对常量的声明，通过使用<strong>parameter</strong>关键字</p>
+</li>
+</ol>
+<pre class="line-numbers language-fortran"><code class="language-fortran"><span class="token keyword">integer</span> <span class="token punctuation">,</span> <span class="token keyword">parameter</span> <span class="token operator">::</span> const <span class="token operator">=</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<h2 id="算术运算符"><a href="#算术运算符" class="headerlink" title="算术运算符"></a>算术运算符</h2><p>基本的数学运算符以及关系运算符(== , &gt;=…)与C基本相同，逻辑运算符与ncl相同,在含有等于的运算符多了一个v(如.eq.变为了.eqv.)</p>
+<h2 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h2><p>与C类似，不同的是switch case 变为了 select  case</p>
+<h2 id="循环语句"><a href="#循环语句" class="headerlink" title="循环语句"></a>循环语句</h2><p>使用<strong>do</strong>或者<strong>do while</strong>来控制循环，循环可以嵌套，且存在内部声明的变量为局部变量，使用<strong>exit</strong>来退出循环，<strong>cycle</strong>作用类似于continue</p>
+
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
           <h1><a href="/2022/01/02/2021年总结/">2021年总结</a></h1>
         
       
@@ -142,164 +206,6 @@
 </ul>
 </li>
 </ol>
-
-      </div>
-  </article>
-
-  <article class="post">
-      
-        
-          <h1><a href="/2020/08/26/TensorFlow/">TensorFlow1.x学习笔记</a></h1>
-        
-      
-      <div class="post-content ">
-        
-  
-
-
-
-
-        <h2 id="debug"><a href="#debug" class="headerlink" title="debug"></a>debug</h2><h3 id="module-‘tensorflow’-has-no-attribute-‘Session’-已修复"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’-已修复" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’(已修复)"></a>module ‘tensorflow’ has no attribute ‘Session’(已修复)</h3><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch</p>
-<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
-tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
-config <span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>ConfigProto<span class="token punctuation">(</span>allow_soft_placement<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-sess<span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>Session<span class="token punctuation">(</span>config<span class="token operator">=</span>config<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="建立一个简单的回归分析模型"><a href="#建立一个简单的回归分析模型" class="headerlink" title="建立一个简单的回归分析模型"></a>建立一个简单的回归分析模型</h2><ol>
-<li>首先使用placeholder为输入与输出创建占位符，同时为权重和截距创建合适的变量</li>
-</ol>
-<pre class="line-numbers language-pyhton"><code class="language-pyhton">x = tf.placeholder(tf.float32 , shape = [None ,3]) #输入
-y_ture = tf.placeholder(tf.float32 , shape = None) #实际值
-w = tf.Variable([[0,0,0]] , dtype = tf.float32 , 
-name = 'weights')  #权重
-b = tf.Variable(0 , dtype = tf.float32 , name = 'bias') #截距
-y_pred = tf.matmul(w , tf.transpose(x)) + b #预测值<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ol start="2">
-<li>接下来，需要来评估模型的性能，为了刻画预测值与真实值的差异，需要订一个反应“距离”的度量，一般称为<strong>损失函数</strong>，通过寻找一组参数来最小化损失函数优化模型。一般使用<strong>MSE(均方差)和交叉熵</strong></li>
-</ol>
-<pre class="line-numbers language-pyhton"><code class="language-pyhton">#-----------------MRE
-loss = tf.reduce_mean(tf.square(y_ture - y_pred)) #MSE
-#----------------交叉熵
-loss = tf.nn.sigmod_cross_entropy_with_logits(lables = y_ture , logits = y_pred)
-loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ol start="3">
-<li><p>接下来需要明白如何最小化损失函数，一般使用<strong>梯度下降法</strong>，尽管可能陷入局部最优，但是一般都是足够好的。</p>
-</li>
-<li><p>由于计算整个样本集合可能会很慢，所以需要使用一些采样方法，对样本的子集进行采样，一般规模在50~500个一次，过小的样本会使得硬件利用率降低，而且会使得<strong>目标函数</strong>产生较大的波动，但有时波动也是有益的，因为能够使得参数跳跃到新的局部最优值，TF中通过向图中添加新的操作然后使用自动差分来计算梯度，需要设置的就是学习率，来确定每次更新迭代的量，一般更倾向于设置较小的学习率，以防止跳过了局部最优解，但过低会导致损失函数减少的十分慢。</p>
-</li>
-</ol>
-<pre class="line-numbers language-python"><code class="language-python">optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>GradientDsecentOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
-train <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>loss<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h3><p>使用numpy生成数据，创建了三个特征向量样本，每个样本内积乘以一组权重加上偏差项再加上噪声得出结果，通过优化模型找到最佳参数</p>
-<pre class="line-numbers language-python"><code class="language-python">
-<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
-<span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1 <span class="token keyword">as</span> tf
-tf<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
-x_data <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">2000</span> <span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
-w_real <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.3</span> <span class="token punctuation">,</span> <span class="token number">0.5</span> <span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">]</span>
-b_real <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">0.2</span>
-
-noise <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2000</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">0.1</span>
-y_data <span class="token operator">=</span> np<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>w_real <span class="token punctuation">,</span> x_data<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token operator">+</span> b_real <span class="token operator">+</span> noise
-<span class="token comment" spellcheck="true">#生成数据</span>
-NUM_STEPS <span class="token operator">=</span> <span class="token number">11</span>
-wb <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-g <span class="token operator">=</span> tf<span class="token punctuation">.</span>Graph<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">with</span> g<span class="token punctuation">.</span>as_default<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    x <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    y_true <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span>shape<span class="token operator">=</span>None<span class="token punctuation">)</span>
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'inference'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
-        w <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> dtype <span class="token operator">=</span> tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> name <span class="token operator">=</span> <span class="token string">'weights'</span><span class="token punctuation">)</span>
-        b <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span><span class="token number">0</span> <span class="token punctuation">,</span> dtype <span class="token operator">=</span> tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> name <span class="token operator">=</span> <span class="token string">'bias'</span><span class="token punctuation">)</span>
-        y_pred <span class="token operator">=</span> tf<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>w <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>transpose<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> b
-
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'loss'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
-        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>square<span class="token punctuation">(</span>y_true <span class="token operator">-</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'train'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
-        learning_rate <span class="token operator">=</span> <span class="token number">0.5</span>
-        optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>GradientDescentOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
-        train <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>loss<span class="token punctuation">)</span>
-
-    init <span class="token operator">=</span> tf<span class="token punctuation">.</span>global_variables_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sess<span class="token punctuation">:</span>
-        sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>init<span class="token punctuation">)</span>
-        <span class="token keyword">for</span> step <span class="token keyword">in</span> range<span class="token punctuation">(</span>NUM_STEPS<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>train<span class="token punctuation">,</span>feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x <span class="token punctuation">:</span>x_data <span class="token punctuation">,</span> y_true <span class="token punctuation">:</span> y_data<span class="token punctuation">}</span><span class="token punctuation">)</span>
-            <span class="token keyword">if</span> step <span class="token operator">%</span> <span class="token number">5</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
-                <span class="token keyword">print</span><span class="token punctuation">(</span>step <span class="token punctuation">,</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-                wb<span class="token punctuation">.</span>append<span class="token punctuation">(</span>sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="逻辑回归"><a href="#逻辑回归" class="headerlink" title="逻辑回归"></a>逻辑回归</h3><p>一般用来进行二分类任务，输出一个0-1之间地离散二值结果，通过sigmoid函数来将数值映射到0到1之间，之后通过阈值分类器来将0到1之间的值转换为0或1，与之前代码的唯一不同是损失函数部分</p>
-<pre class="line-numbers language-pyhton"><code class="language-pyhton">with tf.name_scope('loss') as scope:
-loss = tf.nn.sigmoid_cross_entropy_with_logits(labels = y_true , logits = y_pred)
-loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h2 id="CNN"><a href="#CNN" class="headerlink" title="CNN"></a>CNN</h2><p>层中的神经元只与前一层中的一小块区域连接，而不是采取全连接方式，主要由输入层，卷积层，ReLU层，池化层和全连接层构成(一般将卷积层和ReLU层一起称为卷积层)具体说来，卷积层和全连接层（CONV/FC）对输入执行变换操作的时候，不仅会用到激活函数，还会用到很多参数，即神经元的权值w和偏差b；而ReLU层和池化层则是进行一个固定不变的函数操作。卷积层和全连接层中的参数会随着梯度下降被训练，这样卷积神经网络计算出的分类评分就能和训练集中的每个图像的标签吻合了。</p>
-<h3 id="卷积层"><a href="#卷积层" class="headerlink" title="卷积层"></a>卷积层</h3><p>参数由一些可学习的滤波器集合构成，只观察输入数据中的一小部分，由于卷积有“权值共享”这样的特性，可以降低参数的数量，防止参数过多造成过拟合。每个神经元连接的空间大小叫做神经元的感受野，深度与输入相同，但宽高是局部的。输出数据体和使用的滤波器的数量一致，将沿着深度方向排列。有时候在输入数据体的边缘使用0进行填充，使得滤波器可以平滑地在数据上滑动，一般是用来保持数据体的空间尺寸使输入输出宽高相同。如果在一个深度切片中的所有权重都使用同一个权重向量，那么卷积层的前向传播在每个深度切片中可以看做是在计算神经元权重和输入数据体的卷积（这就是“卷积层”名字由来）。这也是为什么总是将这些权重集合称为滤波器（filter）（或卷积核（kernel）），因为它们和输入进行了卷积。简单来说，就是一个在原始数据上以步长为长度不断移动的一个矩阵，层数与原始数据一致，将每个对应位置的数据进行乘积并且将每层的值相加，即为输出的一个数据，例如RGB通道下就是三层滤波器所得相加填入新的矩阵当中。</p>
-<h3 id="池化层"><a href="#池化层" class="headerlink" title="池化层"></a>池化层</h3><p>用来简化数据，减少计算量，有最大池化和平均池化，使用较多的是最大池化，通过找出某一个区域内的最大值/平均值来缩小数据，一般使用的参数是f=2，p=2 恰好为缩小数据为原来的一半，并且反向传播没有参数适用于池化，这一过程是静态过程，参数都是手动设定，或是交叉验证得到的，只用于简化数据，提取特征。</p>
-<h3 id="全连接层"><a href="#全连接层" class="headerlink" title="全连接层"></a>全连接层</h3><p>将池化层简化后的数据进行提取，将特征整合到一起，输出为一个值，主要作用是减小特征位置对于结果产生的影响，将结果进行分类，一般不止一层，需要将提取出来的特征神经元激活后，通过不同神经元激活的组合，再提取出结果</p>
-<p>简单的卷积实现mnist识别,将测试过程分为每个大小为1000幅图的十块</p>
-<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1 <span class="token keyword">as</span> tf
-<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
-<span class="token keyword">from</span> tensorflow<span class="token punctuation">.</span>examples<span class="token punctuation">.</span>tutorials<span class="token punctuation">.</span>mnist <span class="token keyword">import</span> input_data
-DATA_DIR <span class="token operator">=</span> <span class="token string">'/tmp/data'</span>
-NUM_STEPS <span class="token operator">=</span> <span class="token number">10000</span>
-MINIBATCH_SIZE <span class="token operator">=</span> <span class="token number">100</span>
-tf<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">weight_variable</span><span class="token punctuation">(</span>shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    initial <span class="token operator">=</span> tf<span class="token punctuation">.</span>truncated_normal<span class="token punctuation">(</span>shape <span class="token punctuation">,</span> stddev<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span>initial<span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">bias_variable</span><span class="token punctuation">(</span>shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    initial <span class="token operator">=</span> tf<span class="token punctuation">.</span>constant<span class="token punctuation">(</span><span class="token number">0.1</span> <span class="token punctuation">,</span> shape <span class="token operator">=</span> shape<span class="token punctuation">)</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span>initial<span class="token punctuation">)</span>
-<span class="token keyword">def</span> conv2d <span class="token punctuation">(</span>x <span class="token punctuation">,</span> w<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>conv2d<span class="token punctuation">(</span>x <span class="token punctuation">,</span> w <span class="token punctuation">,</span> strides <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span> <span class="token punctuation">,</span><span class="token number">1</span> <span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> padding <span class="token operator">=</span> <span class="token string">'SAME'</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">max_pool_2x2</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>max_pool<span class="token punctuation">(</span>x <span class="token punctuation">,</span> ksize <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span> <span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> strides <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> padding<span class="token operator">=</span><span class="token string">'SAME'</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">conv_layer</span><span class="token punctuation">(</span>input <span class="token punctuation">,</span> shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    w <span class="token operator">=</span> weight_variable<span class="token punctuation">(</span>shape<span class="token punctuation">)</span>
-    b <span class="token operator">=</span> bias_variable<span class="token punctuation">(</span><span class="token punctuation">[</span>shape<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>conv2d<span class="token punctuation">(</span>input<span class="token punctuation">,</span>w<span class="token punctuation">)</span><span class="token operator">+</span>b<span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">full_layer</span><span class="token punctuation">(</span>input <span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    in_size <span class="token operator">=</span> int<span class="token punctuation">(</span>input<span class="token punctuation">.</span>get_shape<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    w <span class="token operator">=</span> weight_variable<span class="token punctuation">(</span><span class="token punctuation">[</span>in_size<span class="token punctuation">,</span>size<span class="token punctuation">]</span><span class="token punctuation">)</span>
-    b <span class="token operator">=</span> bias_variable<span class="token punctuation">(</span><span class="token punctuation">[</span>size<span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>input<span class="token punctuation">,</span>w<span class="token punctuation">)</span> <span class="token operator">+</span> b
-x <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-y_ <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-x_image <span class="token operator">=</span> tf<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span>x<span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">28</span><span class="token punctuation">,</span><span class="token number">28</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-conv1 <span class="token operator">=</span> conv_layer<span class="token punctuation">(</span>x_image <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">32</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-conv1_pool <span class="token operator">=</span> max_pool_2x2<span class="token punctuation">(</span>conv1<span class="token punctuation">)</span>
-
-conv2 <span class="token operator">=</span> conv_layer<span class="token punctuation">(</span>conv1_pool <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">32</span><span class="token punctuation">,</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-conv2_pool <span class="token operator">=</span> max_pool_2x2<span class="token punctuation">(</span>conv2<span class="token punctuation">)</span>
-
-conv2_flat <span class="token operator">=</span> tf<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span>conv2_pool<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">7</span><span class="token operator">*</span><span class="token number">7</span><span class="token operator">*</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-full_1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>full_layer<span class="token punctuation">(</span>conv2_flat <span class="token punctuation">,</span> <span class="token number">1024</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-keep_prob <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
-full1_drop <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>dropout<span class="token punctuation">(</span>full_1 <span class="token punctuation">,</span> keep_prob <span class="token operator">=</span> keep_prob<span class="token punctuation">)</span>
-
-y_conv <span class="token operator">=</span> full_layer<span class="token punctuation">(</span>full1_drop <span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
-
-minst <span class="token operator">=</span> input_data<span class="token punctuation">.</span>read_data_sets<span class="token punctuation">(</span>DATA_DIR <span class="token punctuation">,</span> one_hot<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-cross_entropy <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>softmax_cross_entropy_with_logits<span class="token punctuation">(</span>logits <span class="token operator">=</span> y_conv <span class="token punctuation">,</span> labels <span class="token operator">=</span> y_<span class="token punctuation">)</span> <span class="token punctuation">)</span>
-train_step <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>AdamOptimizer<span class="token punctuation">(</span><span class="token number">1e</span><span class="token operator">-</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>cross_entropy<span class="token punctuation">)</span>
-correct_prediction <span class="token operator">=</span> tf<span class="token punctuation">.</span>equal<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>y_conv <span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>arg_max<span class="token punctuation">(</span>y_<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-accuracy <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>cast<span class="token punctuation">(</span>correct_prediction <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token keyword">with</span> tf<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sess<span class="token punctuation">:</span>
-    sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>global_variables_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>NUM_STEPS<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        batch <span class="token operator">=</span> minst<span class="token punctuation">.</span>train<span class="token punctuation">.</span>next_batch<span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span>
-
-        <span class="token keyword">if</span> i <span class="token operator">%</span> <span class="token number">100</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
-            train_accuracy <span class="token operator">=</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>accuracy <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">1.0</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
-            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"step {} , train accuracy {}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>i<span class="token punctuation">,</span>train_accuracy<span class="token punctuation">)</span><span class="token punctuation">)</span>
-        sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>train_step <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">0.5</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
-        X <span class="token operator">=</span> minst<span class="token punctuation">.</span>test<span class="token punctuation">.</span>images<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">1000</span><span class="token punctuation">,</span><span class="token number">784</span><span class="token punctuation">)</span>
-        Y <span class="token operator">=</span> minst<span class="token punctuation">.</span>test<span class="token punctuation">.</span>labels<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">1000</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span>
-        test_accuracy <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">[</span>sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>accuracy <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>Y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">1.0</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"test accuracy: {}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>test_accuracy<span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="ResNet"><a href="#ResNet" class="headerlink" title="ResNet"></a>ResNet</h3><p>深度残差网络（Deep residual network, ResNet）的提出是CNN图像史上的一件里程碑事件.通过引入残差学习的方法来解决网络在随着深度增加时出现的准确度饱和下降，梯度爆炸以及消失的难以训练的问题。对于一个堆积结构，在输入x时，学到的特征为H(x)，现在希望其学到残差即 H(x)-x,这样即使残差为0时，也仅是在层之间做了恒等映射，至少不会性能下降，残差使得其会在本有的特征上学习到新的特征，有点类似电路中的短路`</p>
 
       </div>
   </article>
@@ -525,6 +431,164 @@ num_batches <span class="token operator">=</span> int<span class="token punctuat
   <article class="post">
       
         
+          <h1><a href="/2020/08/26/TensorFlow/">TensorFlow1.x学习笔记</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <h2 id="debug"><a href="#debug" class="headerlink" title="debug"></a>debug</h2><h3 id="module-‘tensorflow’-has-no-attribute-‘Session’-已修复"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’-已修复" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’(已修复)"></a>module ‘tensorflow’ has no attribute ‘Session’(已修复)</h3><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
+tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
+config <span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>ConfigProto<span class="token punctuation">(</span>allow_soft_placement<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+sess<span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>Session<span class="token punctuation">(</span>config<span class="token operator">=</span>config<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="建立一个简单的回归分析模型"><a href="#建立一个简单的回归分析模型" class="headerlink" title="建立一个简单的回归分析模型"></a>建立一个简单的回归分析模型</h2><ol>
+<li>首先使用placeholder为输入与输出创建占位符，同时为权重和截距创建合适的变量</li>
+</ol>
+<pre class="line-numbers language-pyhton"><code class="language-pyhton">x = tf.placeholder(tf.float32 , shape = [None ,3]) #输入
+y_ture = tf.placeholder(tf.float32 , shape = None) #实际值
+w = tf.Variable([[0,0,0]] , dtype = tf.float32 , 
+name = 'weights')  #权重
+b = tf.Variable(0 , dtype = tf.float32 , name = 'bias') #截距
+y_pred = tf.matmul(w , tf.transpose(x)) + b #预测值<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ol start="2">
+<li>接下来，需要来评估模型的性能，为了刻画预测值与真实值的差异，需要订一个反应“距离”的度量，一般称为<strong>损失函数</strong>，通过寻找一组参数来最小化损失函数优化模型。一般使用<strong>MSE(均方差)和交叉熵</strong></li>
+</ol>
+<pre class="line-numbers language-pyhton"><code class="language-pyhton">#-----------------MRE
+loss = tf.reduce_mean(tf.square(y_ture - y_pred)) #MSE
+#----------------交叉熵
+loss = tf.nn.sigmod_cross_entropy_with_logits(lables = y_ture , logits = y_pred)
+loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ol start="3">
+<li><p>接下来需要明白如何最小化损失函数，一般使用<strong>梯度下降法</strong>，尽管可能陷入局部最优，但是一般都是足够好的。</p>
+</li>
+<li><p>由于计算整个样本集合可能会很慢，所以需要使用一些采样方法，对样本的子集进行采样，一般规模在50~500个一次，过小的样本会使得硬件利用率降低，而且会使得<strong>目标函数</strong>产生较大的波动，但有时波动也是有益的，因为能够使得参数跳跃到新的局部最优值，TF中通过向图中添加新的操作然后使用自动差分来计算梯度，需要设置的就是学习率，来确定每次更新迭代的量，一般更倾向于设置较小的学习率，以防止跳过了局部最优解，但过低会导致损失函数减少的十分慢。</p>
+</li>
+</ol>
+<pre class="line-numbers language-python"><code class="language-python">optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>GradientDsecentOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
+train <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>loss<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h3><p>使用numpy生成数据，创建了三个特征向量样本，每个样本内积乘以一组权重加上偏差项再加上噪声得出结果，通过优化模型找到最佳参数</p>
+<pre class="line-numbers language-python"><code class="language-python">
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1 <span class="token keyword">as</span> tf
+tf<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
+x_data <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">2000</span> <span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
+w_real <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.3</span> <span class="token punctuation">,</span> <span class="token number">0.5</span> <span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">]</span>
+b_real <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">0.2</span>
+
+noise <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2000</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">0.1</span>
+y_data <span class="token operator">=</span> np<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>w_real <span class="token punctuation">,</span> x_data<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token operator">+</span> b_real <span class="token operator">+</span> noise
+<span class="token comment" spellcheck="true">#生成数据</span>
+NUM_STEPS <span class="token operator">=</span> <span class="token number">11</span>
+wb <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+g <span class="token operator">=</span> tf<span class="token punctuation">.</span>Graph<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">with</span> g<span class="token punctuation">.</span>as_default<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    x <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    y_true <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span>shape<span class="token operator">=</span>None<span class="token punctuation">)</span>
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'inference'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
+        w <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> dtype <span class="token operator">=</span> tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> name <span class="token operator">=</span> <span class="token string">'weights'</span><span class="token punctuation">)</span>
+        b <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span><span class="token number">0</span> <span class="token punctuation">,</span> dtype <span class="token operator">=</span> tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> name <span class="token operator">=</span> <span class="token string">'bias'</span><span class="token punctuation">)</span>
+        y_pred <span class="token operator">=</span> tf<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>w <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>transpose<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> b
+
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'loss'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
+        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>square<span class="token punctuation">(</span>y_true <span class="token operator">-</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'train'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
+        learning_rate <span class="token operator">=</span> <span class="token number">0.5</span>
+        optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>GradientDescentOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
+        train <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>loss<span class="token punctuation">)</span>
+
+    init <span class="token operator">=</span> tf<span class="token punctuation">.</span>global_variables_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span>
+    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sess<span class="token punctuation">:</span>
+        sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>init<span class="token punctuation">)</span>
+        <span class="token keyword">for</span> step <span class="token keyword">in</span> range<span class="token punctuation">(</span>NUM_STEPS<span class="token punctuation">)</span><span class="token punctuation">:</span>
+            sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>train<span class="token punctuation">,</span>feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x <span class="token punctuation">:</span>x_data <span class="token punctuation">,</span> y_true <span class="token punctuation">:</span> y_data<span class="token punctuation">}</span><span class="token punctuation">)</span>
+            <span class="token keyword">if</span> step <span class="token operator">%</span> <span class="token number">5</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+                <span class="token keyword">print</span><span class="token punctuation">(</span>step <span class="token punctuation">,</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                wb<span class="token punctuation">.</span>append<span class="token punctuation">(</span>sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="逻辑回归"><a href="#逻辑回归" class="headerlink" title="逻辑回归"></a>逻辑回归</h3><p>一般用来进行二分类任务，输出一个0-1之间地离散二值结果，通过sigmoid函数来将数值映射到0到1之间，之后通过阈值分类器来将0到1之间的值转换为0或1，与之前代码的唯一不同是损失函数部分</p>
+<pre class="line-numbers language-pyhton"><code class="language-pyhton">with tf.name_scope('loss') as scope:
+loss = tf.nn.sigmoid_cross_entropy_with_logits(labels = y_true , logits = y_pred)
+loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<h2 id="CNN"><a href="#CNN" class="headerlink" title="CNN"></a>CNN</h2><p>层中的神经元只与前一层中的一小块区域连接，而不是采取全连接方式，主要由输入层，卷积层，ReLU层，池化层和全连接层构成(一般将卷积层和ReLU层一起称为卷积层)具体说来，卷积层和全连接层（CONV/FC）对输入执行变换操作的时候，不仅会用到激活函数，还会用到很多参数，即神经元的权值w和偏差b；而ReLU层和池化层则是进行一个固定不变的函数操作。卷积层和全连接层中的参数会随着梯度下降被训练，这样卷积神经网络计算出的分类评分就能和训练集中的每个图像的标签吻合了。</p>
+<h3 id="卷积层"><a href="#卷积层" class="headerlink" title="卷积层"></a>卷积层</h3><p>参数由一些可学习的滤波器集合构成，只观察输入数据中的一小部分，由于卷积有“权值共享”这样的特性，可以降低参数的数量，防止参数过多造成过拟合。每个神经元连接的空间大小叫做神经元的感受野，深度与输入相同，但宽高是局部的。输出数据体和使用的滤波器的数量一致，将沿着深度方向排列。有时候在输入数据体的边缘使用0进行填充，使得滤波器可以平滑地在数据上滑动，一般是用来保持数据体的空间尺寸使输入输出宽高相同。如果在一个深度切片中的所有权重都使用同一个权重向量，那么卷积层的前向传播在每个深度切片中可以看做是在计算神经元权重和输入数据体的卷积（这就是“卷积层”名字由来）。这也是为什么总是将这些权重集合称为滤波器（filter）（或卷积核（kernel）），因为它们和输入进行了卷积。简单来说，就是一个在原始数据上以步长为长度不断移动的一个矩阵，层数与原始数据一致，将每个对应位置的数据进行乘积并且将每层的值相加，即为输出的一个数据，例如RGB通道下就是三层滤波器所得相加填入新的矩阵当中。</p>
+<h3 id="池化层"><a href="#池化层" class="headerlink" title="池化层"></a>池化层</h3><p>用来简化数据，减少计算量，有最大池化和平均池化，使用较多的是最大池化，通过找出某一个区域内的最大值/平均值来缩小数据，一般使用的参数是f=2，p=2 恰好为缩小数据为原来的一半，并且反向传播没有参数适用于池化，这一过程是静态过程，参数都是手动设定，或是交叉验证得到的，只用于简化数据，提取特征。</p>
+<h3 id="全连接层"><a href="#全连接层" class="headerlink" title="全连接层"></a>全连接层</h3><p>将池化层简化后的数据进行提取，将特征整合到一起，输出为一个值，主要作用是减小特征位置对于结果产生的影响，将结果进行分类，一般不止一层，需要将提取出来的特征神经元激活后，通过不同神经元激活的组合，再提取出结果</p>
+<p>简单的卷积实现mnist识别,将测试过程分为每个大小为1000幅图的十块</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1 <span class="token keyword">as</span> tf
+<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">from</span> tensorflow<span class="token punctuation">.</span>examples<span class="token punctuation">.</span>tutorials<span class="token punctuation">.</span>mnist <span class="token keyword">import</span> input_data
+DATA_DIR <span class="token operator">=</span> <span class="token string">'/tmp/data'</span>
+NUM_STEPS <span class="token operator">=</span> <span class="token number">10000</span>
+MINIBATCH_SIZE <span class="token operator">=</span> <span class="token number">100</span>
+tf<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">weight_variable</span><span class="token punctuation">(</span>shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    initial <span class="token operator">=</span> tf<span class="token punctuation">.</span>truncated_normal<span class="token punctuation">(</span>shape <span class="token punctuation">,</span> stddev<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span>initial<span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">bias_variable</span><span class="token punctuation">(</span>shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    initial <span class="token operator">=</span> tf<span class="token punctuation">.</span>constant<span class="token punctuation">(</span><span class="token number">0.1</span> <span class="token punctuation">,</span> shape <span class="token operator">=</span> shape<span class="token punctuation">)</span>
+    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span>initial<span class="token punctuation">)</span>
+<span class="token keyword">def</span> conv2d <span class="token punctuation">(</span>x <span class="token punctuation">,</span> w<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>conv2d<span class="token punctuation">(</span>x <span class="token punctuation">,</span> w <span class="token punctuation">,</span> strides <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span> <span class="token punctuation">,</span><span class="token number">1</span> <span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> padding <span class="token operator">=</span> <span class="token string">'SAME'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">max_pool_2x2</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>max_pool<span class="token punctuation">(</span>x <span class="token punctuation">,</span> ksize <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span> <span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> strides <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> padding<span class="token operator">=</span><span class="token string">'SAME'</span><span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">conv_layer</span><span class="token punctuation">(</span>input <span class="token punctuation">,</span> shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    w <span class="token operator">=</span> weight_variable<span class="token punctuation">(</span>shape<span class="token punctuation">)</span>
+    b <span class="token operator">=</span> bias_variable<span class="token punctuation">(</span><span class="token punctuation">[</span>shape<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>conv2d<span class="token punctuation">(</span>input<span class="token punctuation">,</span>w<span class="token punctuation">)</span><span class="token operator">+</span>b<span class="token punctuation">)</span>
+<span class="token keyword">def</span> <span class="token function">full_layer</span><span class="token punctuation">(</span>input <span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    in_size <span class="token operator">=</span> int<span class="token punctuation">(</span>input<span class="token punctuation">.</span>get_shape<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    w <span class="token operator">=</span> weight_variable<span class="token punctuation">(</span><span class="token punctuation">[</span>in_size<span class="token punctuation">,</span>size<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    b <span class="token operator">=</span> bias_variable<span class="token punctuation">(</span><span class="token punctuation">[</span>size<span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>input<span class="token punctuation">,</span>w<span class="token punctuation">)</span> <span class="token operator">+</span> b
+x <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+y_ <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+x_image <span class="token operator">=</span> tf<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span>x<span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">28</span><span class="token punctuation">,</span><span class="token number">28</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+conv1 <span class="token operator">=</span> conv_layer<span class="token punctuation">(</span>x_image <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">32</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+conv1_pool <span class="token operator">=</span> max_pool_2x2<span class="token punctuation">(</span>conv1<span class="token punctuation">)</span>
+
+conv2 <span class="token operator">=</span> conv_layer<span class="token punctuation">(</span>conv1_pool <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">32</span><span class="token punctuation">,</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+conv2_pool <span class="token operator">=</span> max_pool_2x2<span class="token punctuation">(</span>conv2<span class="token punctuation">)</span>
+
+conv2_flat <span class="token operator">=</span> tf<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span>conv2_pool<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">7</span><span class="token operator">*</span><span class="token number">7</span><span class="token operator">*</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+full_1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>full_layer<span class="token punctuation">(</span>conv2_flat <span class="token punctuation">,</span> <span class="token number">1024</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+keep_prob <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
+full1_drop <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>dropout<span class="token punctuation">(</span>full_1 <span class="token punctuation">,</span> keep_prob <span class="token operator">=</span> keep_prob<span class="token punctuation">)</span>
+
+y_conv <span class="token operator">=</span> full_layer<span class="token punctuation">(</span>full1_drop <span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
+
+minst <span class="token operator">=</span> input_data<span class="token punctuation">.</span>read_data_sets<span class="token punctuation">(</span>DATA_DIR <span class="token punctuation">,</span> one_hot<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
+cross_entropy <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>softmax_cross_entropy_with_logits<span class="token punctuation">(</span>logits <span class="token operator">=</span> y_conv <span class="token punctuation">,</span> labels <span class="token operator">=</span> y_<span class="token punctuation">)</span> <span class="token punctuation">)</span>
+train_step <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>AdamOptimizer<span class="token punctuation">(</span><span class="token number">1e</span><span class="token operator">-</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>cross_entropy<span class="token punctuation">)</span>
+correct_prediction <span class="token operator">=</span> tf<span class="token punctuation">.</span>equal<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>y_conv <span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>arg_max<span class="token punctuation">(</span>y_<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+accuracy <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>cast<span class="token punctuation">(</span>correct_prediction <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">)</span>
+<span class="token keyword">with</span> tf<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sess<span class="token punctuation">:</span>
+    sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>global_variables_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+
+    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>NUM_STEPS<span class="token punctuation">)</span><span class="token punctuation">:</span>
+        batch <span class="token operator">=</span> minst<span class="token punctuation">.</span>train<span class="token punctuation">.</span>next_batch<span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span>
+
+        <span class="token keyword">if</span> i <span class="token operator">%</span> <span class="token number">100</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
+            train_accuracy <span class="token operator">=</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>accuracy <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">1.0</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"step {} , train accuracy {}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>i<span class="token punctuation">,</span>train_accuracy<span class="token punctuation">)</span><span class="token punctuation">)</span>
+        sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>train_step <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">0.5</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
+        X <span class="token operator">=</span> minst<span class="token punctuation">.</span>test<span class="token punctuation">.</span>images<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">1000</span><span class="token punctuation">,</span><span class="token number">784</span><span class="token punctuation">)</span>
+        Y <span class="token operator">=</span> minst<span class="token punctuation">.</span>test<span class="token punctuation">.</span>labels<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">1000</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span>
+        test_accuracy <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">[</span>sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>accuracy <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>Y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">1.0</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
+    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"test accuracy: {}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>test_accuracy<span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="ResNet"><a href="#ResNet" class="headerlink" title="ResNet"></a>ResNet</h3><p>深度残差网络（Deep residual network, ResNet）的提出是CNN图像史上的一件里程碑事件.通过引入残差学习的方法来解决网络在随着深度增加时出现的准确度饱和下降，梯度爆炸以及消失的难以训练的问题。对于一个堆积结构，在输入x时，学到的特征为H(x)，现在希望其学到残差即 H(x)-x,这样即使残差为0时，也仅是在层之间做了恒等映射，至少不会性能下降，残差使得其会在本有的特征上学习到新的特征，有点类似电路中的短路`</p>
+
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
           <h1><a href="/2019/12/26/Mybatis/">Mybatis</a></h1>
         
       
@@ -740,136 +804,6 @@ num_batches <span class="token operator">=</span> int<span class="token punctuat
 
 
         <p>kali中在配置burp suite代理时注意将代理改为127.0.0.1后要在浏览器中相应的修改代理至127.0.0.1,同时如果需要访问https的页面需要导入burp suite的CA证书.</p>
-
-      </div>
-  </article>
-
-  <article class="post">
-      
-        
-          <h1><a href="/2019/10/10/简单题目练手/">练手题目</a></h1>
-        
-      
-      <div class="post-content ">
-        
-  
-
-
-
-
-        <h2 id="写在开头"><a href="#写在开头" class="headerlink" title="写在开头"></a>写在开头</h2><p>写这篇博客旨在把平日练手的一些有趣的小题分享，很多的题应该都不会涉及复杂的算法只是一些想法比较有意思的小题</p>
-<a id="more"></a>
-
-<p> 1.一串数字，长度未知，求其中只出现一次的数。要求时间复杂度O(1),空间复杂度O(0)</p>
-<p>一开始看到这道题想了用标记数组来做，后在看视频的时候无意间看到了”^”这个符号想起来了用位运算来处理每一个数，如果两个数相同异或就会变成0，任何数和0异或又是<br>其本身，代码如下**</p>
-<pre class="line-numbers language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;stdio.h></span></span>
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-    <span class="token keyword">int</span> n<span class="token punctuation">,</span>ans<span class="token operator">=</span><span class="token number">0</span><span class="token punctuation">;</span>
-    <span class="token keyword">while</span><span class="token punctuation">(</span><span class="token constant">EOF</span><span class="token operator">!=</span><span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%d"</span><span class="token punctuation">,</span><span class="token operator">&amp;</span>n<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    <span class="token punctuation">{</span>
-        ans<span class="token operator">^</span><span class="token operator">=</span>n<span class="token punctuation">;</span>
-    <span class="token punctuation">}</span>
-    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"%d\n"</span><span class="token punctuation">,</span>ans<span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>2.给出三个队列 s1，s2，s3 ，判断 s3 是否是由 s1 和 s2 交叉得来。 如：s1 为 aabcc ， s2 为 dbbca。 当 s3 aadbbcbcac 时，返回 true（即将 s1 拆成三部分： aa，bc，c 分别插入 s2 对应位置） 否则返回 false。**</p>
-<p>一开始想到就是字符串匹配问题，代码如下,但没有考虑，前一串以最优情况匹配，后一串在匹配时会因前一串把优先把靠前位置都占据，而出现匹配不<br>上的情况，因此加以优化，将第一串从后往前匹配，将更优的位置给下一串留下，中途甚至想过用每个字符的ASCII码建一个数组，然后只用匹配数量即可，但后来发现这样匹配没有考虑到字符串本来的顺序问题，放弃。</p>
-<pre class="line-numbers language-c"><code class="language-c"><span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;stdio.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;algorithm></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;string.h></span></span>
-<span class="token macro property">#<span class="token directive keyword">include</span><span class="token string">&lt;iostream></span></span>
-using namespace std<span class="token punctuation">;</span>
-<span class="token keyword">char</span> a<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">char</span> b<span class="token punctuation">[</span><span class="token number">100</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">char</span> c<span class="token punctuation">[</span><span class="token number">200</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> ans<span class="token punctuation">[</span><span class="token number">200</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">char</span> d<span class="token punctuation">[</span><span class="token number">400</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-<span class="token keyword">int</span> <span class="token function">main</span><span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token punctuation">{</span>
-    <span class="token function">memset</span><span class="token punctuation">(</span>ans<span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token keyword">sizeof</span><span class="token punctuation">(</span>ans<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token keyword">int</span> i <span class="token operator">=</span> <span class="token number">0</span> <span class="token punctuation">,</span>flag <span class="token operator">=</span> <span class="token number">1</span> <span class="token punctuation">,</span>mark <span class="token operator">=</span> <span class="token number">1</span> <span class="token punctuation">,</span> m <span class="token operator">=</span> <span class="token number">0</span> <span class="token punctuation">,</span> n <span class="token operator">=</span> <span class="token number">0</span> <span class="token punctuation">,</span>pos<span class="token punctuation">;</span>
-   <span class="token function">scanf</span><span class="token punctuation">(</span><span class="token string">"%s"</span><span class="token punctuation">,</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
-   <span class="token function">getchar</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-   <span class="token keyword">while</span><span class="token punctuation">(</span>d<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">!=</span><span class="token string">','</span><span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-       a<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> d<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">;</span>
-       i<span class="token operator">++</span><span class="token punctuation">;</span>
-   <span class="token punctuation">}</span>
-   a<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'\0'</span><span class="token punctuation">;</span>
-   i<span class="token operator">++</span><span class="token punctuation">;</span>
-   <span class="token keyword">while</span><span class="token punctuation">(</span>d<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token operator">!=</span><span class="token string">','</span><span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-       b<span class="token punctuation">[</span>m<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> d<span class="token punctuation">[</span>i<span class="token operator">++</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-   <span class="token punctuation">}</span>
-   b<span class="token punctuation">[</span>m<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'\0'</span><span class="token punctuation">;</span>
-   i<span class="token operator">++</span><span class="token punctuation">;</span>
-   <span class="token keyword">int</span> len <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>d<span class="token punctuation">)</span><span class="token punctuation">;</span>
-   <span class="token keyword">while</span><span class="token punctuation">(</span>i<span class="token operator">&lt;</span>len<span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-       c<span class="token punctuation">[</span>n<span class="token operator">++</span><span class="token punctuation">]</span> <span class="token operator">=</span> d<span class="token punctuation">[</span>i<span class="token operator">++</span><span class="token punctuation">]</span><span class="token punctuation">;</span>
-   <span class="token punctuation">}</span>
-   c<span class="token punctuation">[</span>n<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'\0'</span><span class="token punctuation">;</span>
-   <span class="token keyword">int</span> lena <span class="token operator">=</span> <span class="token function">strlen</span><span class="token punctuation">(</span>a<span class="token punctuation">)</span><span class="token punctuation">;</span>
-   pos <span class="token operator">=</span> lena<span class="token number">-1</span><span class="token punctuation">;</span>
-   <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> j <span class="token operator">=</span> n<span class="token number">-1</span> <span class="token punctuation">;</span> j <span class="token operator">>=</span><span class="token number">0</span> <span class="token punctuation">;</span> j<span class="token operator">--</span><span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-       <span class="token keyword">if</span><span class="token punctuation">(</span>c<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token operator">==</span>a<span class="token punctuation">[</span>pos<span class="token punctuation">]</span><span class="token punctuation">)</span>
-       <span class="token punctuation">{</span>
-           ans<span class="token punctuation">[</span>j<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">;</span>
-           pos<span class="token operator">--</span><span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">if</span><span class="token punctuation">(</span>pos<span class="token operator">!=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-       flag <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-   <span class="token punctuation">}</span>
-   pos <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-   <span class="token keyword">for</span><span class="token punctuation">(</span><span class="token keyword">int</span> j <span class="token operator">=</span> <span class="token number">0</span> <span class="token punctuation">;</span> j <span class="token operator">&lt;</span> n <span class="token punctuation">;</span> j<span class="token operator">++</span><span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-       <span class="token keyword">if</span><span class="token punctuation">(</span>c<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token operator">==</span>b<span class="token punctuation">[</span>pos<span class="token punctuation">]</span><span class="token operator">&amp;&amp;</span>ans<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token operator">!=</span><span class="token number">1</span><span class="token punctuation">)</span>
-       <span class="token punctuation">{</span>
-           pos<span class="token operator">++</span><span class="token punctuation">;</span>
-       <span class="token punctuation">}</span>
-   <span class="token punctuation">}</span>
-
-   <span class="token keyword">if</span><span class="token punctuation">(</span>pos <span class="token operator">!=</span> m<span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-       mark <span class="token operator">=</span> <span class="token number">0</span><span class="token punctuation">;</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">if</span><span class="token punctuation">(</span>mark<span class="token operator">&amp;&amp;</span>flag<span class="token punctuation">)</span>
-   <span class="token punctuation">{</span>
-       <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"true\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">else</span><span class="token punctuation">{</span>
-    <span class="token function">printf</span><span class="token punctuation">(</span><span class="token string">"false\n"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-   <span class="token punctuation">}</span>
-   <span class="token keyword">return</span> <span class="token number">0</span><span class="token punctuation">;</span>
-<span class="token punctuation">}</span>
-<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-      </div>
-  </article>
-
-  <article class="post">
-      
-        
-          <h1><a href="/2019/10/10/单片机学习笔记/">单片机学习笔记</a></h1>
-        
-      
-      <div class="post-content ">
-        
-  
-
-
-
-
-        <h2 id="单片机工作基本时序"><a href="#单片机工作基本时序" class="headerlink" title="单片机工作基本时序"></a>单片机工作基本时序</h2><p>1.振荡周期即提供时钟脉冲信号的震荡源的周期，常见（11.0592）状态周期为时钟周期的两倍即振荡周期的二分频</p>
-<p>2.机器周期 包含6个状态周期 。 12个时钟周期 ，在一个周期内cpu完成一个独立的操作<br>指令周期 CPU完成一条操作所需的全部时间</p>
-<a id="more"></a>
-<p>3.三极管：流控流，压控压型，PNP型在be之间的节电压正偏时，导通（c极连接了vcc，b极连接单片机，在b极给一个低电压时导通）<br>~按位取反，今天在实现模拟二进制递增时，使用了在每一位为1时让单片机在对应的位置上亮，但单片机上控制led亮，需要单片机输出一个低电平，刚好使用取反。</p>
-<p>单片机学习在最近需要搁置一下了,因为学习单片机主要是为了之后的那个项目,但近期先准备好完成ctf的比赛以及学校派发的任务先.2019-10-23</p>
-<h2 id="Arduino学习笔记"><a href="#Arduino学习笔记" class="headerlink" title="Arduino学习笔记"></a>Arduino学习笔记</h2><p>1.Arduino会在启动时执行void setup(){ }中的指令，后无限循环void loop(){  }中的指令，pinMode()指定某个端口的动作，有INPUT和OUTPUT.<br>2.digitalWrite(),在一个pin口被定义为OUPUT后，使用该函数可以将其定义为HIGH或者LOW，如果为INPUT时，如果为HIGH则将启用内部上拉，LOW禁用内部上拉。同时Ardunio自己内置了delay函数。<br>3.使用Serial()可以与电脑连接。从Serial.begin()开始，后续可以调用serial中的其他函数。(println等等)</p>
 
       </div>
   </article>
