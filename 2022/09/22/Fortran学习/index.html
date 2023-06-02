@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="Kopaba">
 <meta property="og:description" content="baisc语法基本构成fortran程序由一组程序单元组成，每个包含一个主程序，语法如下 program program_name implicit none end program program_name 命名以及字符集与C语言所包含的ASCII字符集基本相同，标识符即变量名称不区分大小写，且第一个字符必须是字母 关键字https://wenku.baidu.com/view/08bea464">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2022-09-24T05:51:50.000Z">
+<meta property="og:updated_time" content="2023-02-17T13:33:26.752Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="Fortran学习">
 <meta name="twitter:description" content="baisc语法基本构成fortran程序由一组程序单元组成，每个包含一个主程序，语法如下 program program_name implicit none end program program_name 命名以及字符集与C语言所包含的ASCII字符集基本相同，标识符即变量名称不区分大小写，且第一个字符必须是字母 关键字https://wenku.baidu.com/view/08bea464">
@@ -76,7 +76,7 @@
 <h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><p>分为了5种包括整数，浮点数，复杂数，布尔类型，字符类型</p>
 <ol>
 <li>整数(integer)与C语言中的int类似，仅保存整数</li>
-<li>浮点数(real)默认类型为双精度浮点数，可通过<strong>kind</strong>函数对其以及整数进行精度控制，对整数是控制其所占字节大小，通过<strong>huge</strong>函数可以得到某一整数变量的最大值</li>
+<li>浮点数(real)默认类型为双精度浮点数，可通过<strong>kind</strong>函数对其以及整数进行精度控制，对整数是控制其所占字节大小，通过<strong>huge</strong>函数可以得到某一整数变量的最大值。通过数字后加<strong>d0</strong>来声明数字为双精度实数</li>
 <li>复杂类型(complex)用于存储复数，赋值有两种方式，无论输入参数如何，其实部和虚部均为单精度</li>
 </ol>
 <pre class="line-numbers language-fortran"><code class="language-fortran"><span class="token keyword">complex</span> <span class="token operator">::</span> cx
@@ -93,9 +93,18 @@ cx <span class="token operator">=</span> cmplx<span class="token punctuation">(<
 </li>
 </ol>
 <pre class="line-numbers language-fortran"><code class="language-fortran"><span class="token keyword">integer</span> <span class="token punctuation">,</span> <span class="token keyword">parameter</span> <span class="token operator">::</span> const <span class="token operator">=</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ol start="5">
+<li>动态数组(Dynamic Arrays)编译时大小未知，执行时已知，通过<strong>allocatable</strong>来声明动态数组，必须声明数组的维度，通过<strong>allocate</strong>函数，随后可以通过deallocate来释放内存</li>
+</ol>
 <h2 id="算术运算符"><a href="#算术运算符" class="headerlink" title="算术运算符"></a>算术运算符</h2><p>基本的数学运算符以及关系运算符(== , &gt;=…)与C基本相同，逻辑运算符与ncl相同,在含有等于的运算符多了一个v(如.eq.变为了.eqv.)</p>
 <h2 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h2><p>与C类似，不同的是switch case 变为了 select  case</p>
 <h2 id="循环语句"><a href="#循环语句" class="headerlink" title="循环语句"></a>循环语句</h2><p>使用<strong>do</strong>或者<strong>do while</strong>来控制循环，循环可以嵌套，且存在内部声明的变量为局部变量，使用<strong>exit</strong>来退出循环，<strong>cycle</strong>作用类似于continue</p>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><ol>
+<li><p>通过<strong>subroutine</strong>关键字来声明函数也称为子程序，在主函数中通过call来调用,fortran中函数的返回值较为特殊，在subroutine声明的函数中需要将返回值也作为函数参数声明，bingqie</p>
+</li>
+<li><p>通过<strong>function</strong>声明,需要注意在主函数中声明函数与函数类型，且结果返回值以函数名为结果，即返回 <strong>函数名=expression</strong>，同时函数中需要对参数进行声明时加上<strong>intent(in)</strong>关键字，并且此时参数为局部变量，变量不可修改，声明<strong>intent(out)</strong>变量不可为函数参数，但可以修改且可向外输送；<strong>intent(inout)</strong>既可以作为参数同时也可作为输出的结果，效果等同不声明intent，一般来说，在函数中其优势为局部变量，intent应该总为in，如果要使用其他的intent则应该使用subroutine热不是function</p>
+</li>
+</ol>
 
   </div>
   

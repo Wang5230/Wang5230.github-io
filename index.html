@@ -56,6 +56,106 @@
   <article class="post">
       
         
+          <h1><a href="/2023/03/15/py-in-met/">py in met</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <h2 id="写在前面"><a href="#写在前面" class="headerlink" title="写在前面"></a>写在前面</h2><p>这篇博客主要记录在使用python进行气象数据处理/绘制中的一些问题<br><strong>np.meshgrid(lon_grid,lat_grid)</strong> 可以将经纬度转换为对应的坐标点<br><strong>xarray.Dataarray</strong> 具有标签属性(例如lat，lon)<br> <strong>numpy.array</strong>不具有标签属性</p>
+
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
+          <h1><a href="/2023/03/08/GPM/">GPM</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <h1 id="数据介绍"><a href="#数据介绍" class="headerlink" title="数据介绍"></a>数据介绍</h1><p>GPM数据分为两类</p>
+<ol>
+<li>观测后4小时与十四小时的逐半小时0.1x0.1资料</li>
+<li>观测后3.5月后的逐月0.1x0.1资料</li>
+</ol>
+<h2 id="数据处理"><a href="#数据处理" class="headerlink" title="数据处理"></a>数据处理</h2><ol>
+<li>将观测资料进行质量控制，筛除缺测，通过时间对缺测全天的数据索引进行标记，之后将GPM资料做相同处理，进行相关系数等的计算</li>
+<li>论文中讲述顺序要由大到小，由总体到局部</li>
+</ol>
+<h1 id="脚本留档"><a href="#脚本留档" class="headerlink" title="脚本留档"></a>脚本留档</h1><pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> matplotlib<span class="token punctuation">.</span>pyplot <span class="token keyword">as</span> plt
+<span class="token keyword">from</span> matplotlib<span class="token punctuation">.</span>pyplot <span class="token keyword">import</span> MultipleLocator
+<span class="token keyword">from</span> matplotlib<span class="token punctuation">.</span>ticker <span class="token keyword">import</span> FuncFormatter
+<span class="token keyword">import</span> os
+<span class="token keyword">import</span> cartopy<span class="token punctuation">.</span>crs <span class="token keyword">as</span> ccrs
+<span class="token keyword">from</span> cartopy<span class="token punctuation">.</span>io<span class="token punctuation">.</span>shapereader <span class="token keyword">import</span> Reader
+<span class="token keyword">import</span> cartopy<span class="token punctuation">.</span>feature <span class="token keyword">as</span> cfeat
+<span class="token keyword">import</span> xarray <span class="token keyword">as</span> xr
+<span class="token keyword">import</span> matplotlib <span class="token keyword">as</span> mpl
+<span class="token keyword">import</span> h5py
+<span class="token keyword">from</span> scipy <span class="token keyword">import</span> interpolate <span class="token keyword">as</span> ip
+<span class="token keyword">import</span> shapefile
+<span class="token keyword">from</span> matplotlib<span class="token punctuation">.</span>path <span class="token keyword">import</span> Path
+<span class="token keyword">from</span> matplotlib<span class="token punctuation">.</span>patches <span class="token keyword">import</span> PathPatch
+mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'font.family'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'sans-serif'</span>
+mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'font.sans-serif'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'Times New Roman'</span><span class="token punctuation">]</span>
+mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'axes.unicode_minus'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">False</span>
+<span class="token keyword">def</span> <span class="token function">to_latitude</span><span class="token punctuation">(</span>temp<span class="token punctuation">,</span> position<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token string">'%1.0f'</span><span class="token operator">%</span><span class="token punctuation">(</span>temp<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">'°N'</span>
+<span class="token keyword">def</span> <span class="token function">to_longtitude</span><span class="token punctuation">(</span>temp<span class="token punctuation">,</span>position<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token string">'%1.0f'</span><span class="token operator">%</span><span class="token punctuation">(</span>temp<span class="token punctuation">)</span><span class="token operator">+</span> <span class="token string">'°E'</span>
+<span class="token keyword">def</span> <span class="token function">to_time</span><span class="token punctuation">(</span>temp<span class="token punctuation">,</span>position<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">if</span> temp <span class="token operator">&lt;</span> <span class="token number">10</span><span class="token punctuation">:</span>
+        <span class="token keyword">return</span> <span class="token string">'0'</span><span class="token operator">+</span><span class="token string">'%1.0f'</span><span class="token operator">%</span><span class="token punctuation">(</span>temp<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">':00'</span>
+    <span class="token keyword">return</span> <span class="token string">'%1.0f'</span><span class="token operator">%</span><span class="token punctuation">(</span>temp<span class="token punctuation">)</span><span class="token operator">+</span><span class="token string">':00'</span>         <span class="token comment" spellcheck="true">##转换坐标轴</span>
+<span class="token keyword">def</span> <span class="token function">countLine</span><span class="token punctuation">(</span>file_path<span class="token punctuation">)</span><span class="token punctuation">:</span> 
+    count <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">1</span>
+    <span class="token keyword">for</span> count<span class="token punctuation">,</span>line <span class="token keyword">in</span> enumerate<span class="token punctuation">(</span>open<span class="token punctuation">(</span>file_path<span class="token punctuation">,</span><span class="token string">'r'</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        <span class="token keyword">pass</span>
+        count <span class="token operator">+=</span> <span class="token number">1</span>
+    <span class="token keyword">return</span> count
+
+
+<span class="token keyword">def</span> <span class="token function">shp2clip</span><span class="token punctuation">(</span>originfig<span class="token punctuation">,</span> ax<span class="token punctuation">,</span> shpfile<span class="token punctuation">,</span> regionlist<span class="token punctuation">)</span><span class="token punctuation">:</span>  <span class="token comment" spellcheck="true">#白化函数 将contour在shp区域外转为白色</span>
+    sf <span class="token operator">=</span> shapefile<span class="token punctuation">.</span>Reader<span class="token punctuation">(</span>shpfile<span class="token punctuation">)</span>
+    vertices <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    codes <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
+    <span class="token keyword">for</span> shape_rec <span class="token keyword">in</span> sf<span class="token punctuation">.</span>shapeRecords<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+        region_name <span class="token operator">=</span> shape_rec<span class="token punctuation">.</span>record<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true">#是否是[0]得自行分析自己的shp文件</span>
+        <span class="token keyword">if</span> region_name <span class="token keyword">in</span> regionlist<span class="token punctuation">:</span> 
+            pts <span class="token operator">=</span> shape_rec<span class="token punctuation">.</span>shape<span class="token punctuation">.</span>points
+            prt <span class="token operator">=</span> list<span class="token punctuation">(</span>shape_rec<span class="token punctuation">.</span>shape<span class="token punctuation">.</span>parts<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token punctuation">[</span>len<span class="token punctuation">(</span>pts<span class="token punctuation">)</span><span class="token punctuation">]</span>
+            <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>len<span class="token punctuation">(</span>prt<span class="token punctuation">)</span> <span class="token operator">-</span> <span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                <span class="token keyword">for</span> j <span class="token keyword">in</span> range<span class="token punctuation">(</span>prt<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span> prt<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+                    vertices<span class="token punctuation">.</span>append<span class="token punctuation">(</span><span class="token punctuation">(</span>pts<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> pts<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+                codes <span class="token operator">+=</span> <span class="token punctuation">[</span>Path<span class="token punctuation">.</span>MOVETO<span class="token punctuation">]</span>
+                codes <span class="token operator">+=</span> <span class="token punctuation">[</span>Path<span class="token punctuation">.</span>LINETO<span class="token punctuation">]</span> <span class="token operator">*</span> <span class="token punctuation">(</span>prt<span class="token punctuation">[</span>i<span class="token operator">+</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token operator">-</span> prt<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token operator">-</span><span class="token number">2</span><span class="token punctuation">)</span>
+                codes <span class="token operator">+=</span> <span class="token punctuation">[</span>Path<span class="token punctuation">.</span>CLOSEPOLY<span class="token punctuation">]</span>
+            clip <span class="token operator">=</span> Path<span class="token punctuation">(</span>vertices<span class="token punctuation">,</span> codes<span class="token punctuation">)</span>
+            clip <span class="token operator">=</span> PathPatch<span class="token punctuation">(</span>clip<span class="token punctuation">,</span> transform<span class="token operator">=</span>ax<span class="token punctuation">.</span>transData<span class="token punctuation">)</span>
+    <span class="token keyword">for</span> contour <span class="token keyword">in</span> originfig<span class="token punctuation">.</span>collections<span class="token punctuation">:</span>
+        contour<span class="token punctuation">.</span>set_clip_path<span class="token punctuation">(</span>clip<span class="token punctuation">)</span>
+
+    <span class="token keyword">return</span> clip
+<span class="token comment" spellcheck="true">##shp2clip(tt,ax,sy,['辽宁省'])</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
           <h1><a href="/2022/12/03/bash/">bash</a></h1>
         
       
@@ -113,7 +213,7 @@
 <h2 id="数据类型"><a href="#数据类型" class="headerlink" title="数据类型"></a>数据类型</h2><p>分为了5种包括整数，浮点数，复杂数，布尔类型，字符类型</p>
 <ol>
 <li>整数(integer)与C语言中的int类似，仅保存整数</li>
-<li>浮点数(real)默认类型为双精度浮点数，可通过<strong>kind</strong>函数对其以及整数进行精度控制，对整数是控制其所占字节大小，通过<strong>huge</strong>函数可以得到某一整数变量的最大值</li>
+<li>浮点数(real)默认类型为双精度浮点数，可通过<strong>kind</strong>函数对其以及整数进行精度控制，对整数是控制其所占字节大小，通过<strong>huge</strong>函数可以得到某一整数变量的最大值。通过数字后加<strong>d0</strong>来声明数字为双精度实数</li>
 <li>复杂类型(complex)用于存储复数，赋值有两种方式，无论输入参数如何，其实部和虚部均为单精度</li>
 </ol>
 <pre class="line-numbers language-fortran"><code class="language-fortran"><span class="token keyword">complex</span> <span class="token operator">::</span> cx
@@ -130,9 +230,18 @@ cx <span class="token operator">=</span> cmplx<span class="token punctuation">(<
 </li>
 </ol>
 <pre class="line-numbers language-fortran"><code class="language-fortran"><span class="token keyword">integer</span> <span class="token punctuation">,</span> <span class="token keyword">parameter</span> <span class="token operator">::</span> const <span class="token operator">=</span> <span class="token number">1</span><span aria-hidden="true" class="line-numbers-rows"><span></span></span></code></pre>
+<ol start="5">
+<li>动态数组(Dynamic Arrays)编译时大小未知，执行时已知，通过<strong>allocatable</strong>来声明动态数组，必须声明数组的维度，通过<strong>allocate</strong>函数，随后可以通过deallocate来释放内存</li>
+</ol>
 <h2 id="算术运算符"><a href="#算术运算符" class="headerlink" title="算术运算符"></a>算术运算符</h2><p>基本的数学运算符以及关系运算符(== , &gt;=…)与C基本相同，逻辑运算符与ncl相同,在含有等于的运算符多了一个v(如.eq.变为了.eqv.)</p>
 <h2 id="条件语句"><a href="#条件语句" class="headerlink" title="条件语句"></a>条件语句</h2><p>与C类似，不同的是switch case 变为了 select  case</p>
 <h2 id="循环语句"><a href="#循环语句" class="headerlink" title="循环语句"></a>循环语句</h2><p>使用<strong>do</strong>或者<strong>do while</strong>来控制循环，循环可以嵌套，且存在内部声明的变量为局部变量，使用<strong>exit</strong>来退出循环，<strong>cycle</strong>作用类似于continue</p>
+<h2 id="函数"><a href="#函数" class="headerlink" title="函数"></a>函数</h2><ol>
+<li><p>通过<strong>subroutine</strong>关键字来声明函数也称为子程序，在主函数中通过call来调用,fortran中函数的返回值较为特殊，在subroutine声明的函数中需要将返回值也作为函数参数声明，bingqie</p>
+</li>
+<li><p>通过<strong>function</strong>声明,需要注意在主函数中声明函数与函数类型，且结果返回值以函数名为结果，即返回 <strong>函数名=expression</strong>，同时函数中需要对参数进行声明时加上<strong>intent(in)</strong>关键字，并且此时参数为局部变量，变量不可修改，声明<strong>intent(out)</strong>变量不可为函数参数，但可以修改且可向外输送；<strong>intent(inout)</strong>既可以作为参数同时也可作为输出的结果，效果等同不声明intent，一般来说，在函数中其优势为局部变量，intent应该总为in，如果要使用其他的intent则应该使用subroutine热不是function</p>
+</li>
+</ol>
 
       </div>
   </article>
@@ -763,49 +872,6 @@ num_batches <span class="token operator">=</span> int<span class="token punctuat
 <li><p>根据配置文件的细腻些创建Connection对象，获取预处理对象PrepareSatement接下来执行查询，将遍历的结果集封装，将结果返回。</p>
 </li>
 </ol>
-
-      </div>
-  </article>
-
-  <article class="post">
-      
-        
-          <h1><a href="/2019/11/24/ArcGIS学习笔记/">ArcGIS学习笔记</a></h1>
-        
-      
-      <div class="post-content ">
-        
-  
-
-
-
-
-        <h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><ol>
-<li><p>ArcGIS在进行一系列操作后可以保存mxd文件，保存上一次的所有操作与显示方式。</p>
-</li>
-<li><p>ArcGIS可以将txt与xls(注意:如果为xlsx格式的在10.2中的ArcGIS中无法直接读取，需要转换为xls)格式的数据带入笛卡尔坐标系，需要自己选择地理坐标系，或是投影坐标系(注意投影坐标系与地理坐标系的区别，前者是信息与选择的投影面产生几何变换后的投影，后者是根据不同的坐标，不同的大地水准面制定出的坐标系)</p>
-</li>
-</ol>
-
-      </div>
-  </article>
-
-  <article class="post">
-      
-        
-          <h1><a href="/2019/10/25/格式化字符/">格式化字符</a></h1>
-        
-      
-      <div class="post-content ">
-        
-  
-
-
-
-
-        <pre class="line-numbers language-c"><code class="language-c"><span class="token keyword">char</span> s<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span>
-<span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<p>这样虽然也可以输出,但是输入交给用户就会出现问题,如果输入的字符串为”%x%x%x%x”会直接出现内存中的数据,这是由于printf函数不知道参数,对于特定的%,会去取相应的参数,直到检索到字符串结束.所以尽管没有参数,上面的代码也会将字符串后面的内存当作参数,以16进制输出.任意的内存读取需要用到%s,其对应的参量是一个指向字符串首地址的指针,且局部变量(格式化字符串,即在printf中的)是存储在栈中,所以一定可以找到输入的字符串.<a id="more"></a><br>此时如果需要修改一些其他变量值,只需要计算参数的偏移量,找出参数位置,通过%n的使用,即可修改程序的参数</p>
 
       </div>
   </article>

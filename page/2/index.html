@@ -56,6 +56,49 @@
   <article class="post">
       
         
+          <h1><a href="/2019/11/24/ArcGIS学习笔记/">ArcGIS学习笔记</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <h2 id="基本操作"><a href="#基本操作" class="headerlink" title="基本操作"></a>基本操作</h2><ol>
+<li><p>ArcGIS在进行一系列操作后可以保存mxd文件，保存上一次的所有操作与显示方式。</p>
+</li>
+<li><p>ArcGIS可以将txt与xls(注意:如果为xlsx格式的在10.2中的ArcGIS中无法直接读取，需要转换为xls)格式的数据带入笛卡尔坐标系，需要自己选择地理坐标系，或是投影坐标系(注意投影坐标系与地理坐标系的区别，前者是信息与选择的投影面产生几何变换后的投影，后者是根据不同的坐标，不同的大地水准面制定出的坐标系)</p>
+</li>
+</ol>
+
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
+          <h1><a href="/2019/10/25/格式化字符/">格式化字符</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <pre class="line-numbers language-c"><code class="language-c"><span class="token keyword">char</span> s<span class="token punctuation">[</span><span class="token number">10</span><span class="token punctuation">]</span>
+<span class="token function">printf</span><span class="token punctuation">(</span>s<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>这样虽然也可以输出,但是输入交给用户就会出现问题,如果输入的字符串为”%x%x%x%x”会直接出现内存中的数据,这是由于printf函数不知道参数,对于特定的%,会去取相应的参数,直到检索到字符串结束.所以尽管没有参数,上面的代码也会将字符串后面的内存当作参数,以16进制输出.任意的内存读取需要用到%s,其对应的参量是一个指向字符串首地址的指针,且局部变量(格式化字符串,即在printf中的)是存储在栈中,所以一定可以找到输入的字符串.<a id="more"></a><br>此时如果需要修改一些其他变量值,只需要计算参数的偏移量,找出参数位置,通过%n的使用,即可修改程序的参数</p>
+
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
           <h1><a href="/2019/10/23/kali/">kali</a></h1>
         
       
