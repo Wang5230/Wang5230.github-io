@@ -1,0 +1,109 @@
+<!DOCTYPE html>
+<html>
+<head><meta name="generator" content="Hexo 3.9.0">
+  <meta charset="utf-8">
+  
+  <title>namelist_wrf_parameter | Kopaba</title>
+  <meta name="viewport" content="width=device-width, initial-scale=1, maximum-scale=1">
+  <meta name="description" content="WRF中namelist参数化方案选项说明&amp;amp;physicsmp_physics 微物理参数化方案 (加粗数字代表选项编号) Kessler scheme 暖雨（无冰）方案，一般用在理想云模型中 1 Purdue Lin scheme 有冰、雪和霰过程，适合真实数据高分辨率模拟 2 WRF Single-Moment 3-calss cheme 适用于中尺度网格带有冰雪过程的简单高效方案 3">
+<meta name="keywords" content="-wrf">
+<meta property="og:type" content="article">
+<meta property="og:title" content="namelist_wrf_parameter">
+<meta property="og:url" content="https://www.wang5230.github.io/2023/09/14/namelist-wrf-parameter/index.html">
+<meta property="og:site_name" content="Kopaba">
+<meta property="og:description" content="WRF中namelist参数化方案选项说明&amp;amp;physicsmp_physics 微物理参数化方案 (加粗数字代表选项编号) Kessler scheme 暖雨（无冰）方案，一般用在理想云模型中 1 Purdue Lin scheme 有冰、雪和霰过程，适合真实数据高分辨率模拟 2 WRF Single-Moment 3-calss cheme 适用于中尺度网格带有冰雪过程的简单高效方案 3">
+<meta property="og:locale" content="zh-CN">
+<meta property="og:updated_time" content="2023-09-16T08:27:34.053Z">
+<meta name="twitter:card" content="summary">
+<meta name="twitter:title" content="namelist_wrf_parameter">
+<meta name="twitter:description" content="WRF中namelist参数化方案选项说明&amp;amp;physicsmp_physics 微物理参数化方案 (加粗数字代表选项编号) Kessler scheme 暖雨（无冰）方案，一般用在理想云模型中 1 Purdue Lin scheme 有冰、雪和霰过程，适合真实数据高分辨率模拟 2 WRF Single-Moment 3-calss cheme 适用于中尺度网格带有冰雪过程的简单高效方案 3">
+  
+    <link rel="alternate" href="/atom.xml" title="Kopaba" type="application/atom+xml">
+  
+  
+  
+  <link rel="stylesheet" href="/lib/font-awesome/css/font-awesome.min.css?v=4.7.0">
+  <link rel="stylesheet" href="/lib/fancybox/dist/jquery.fancybox.min.css">
+  <link rel="stylesheet" href="/css/main.css">
+  <script src="/lib/jquery/dist/jquery.min.js"></script>
+  
+  
+  
+  
+<link rel="stylesheet" href="/css/prism-tomorrow.css" type="text/css">
+<link rel="stylesheet" href="/css/prism-line-numbers.css" type="text/css"></head></html>
+<body>
+  <div id="wrapper">
+    <header id="header" class="clearfix">
+	<a id="logo" href="/" title="Kopaba">Kopaba</a>
+	
+		<p class="description">Imagination is the essence of discovery</p>
+	
+	<nav id="nav-menu" class="clearfix">
+		<form id="search" method="post" action="./" role="search">
+			<input id="search-input" type="text" name="s" class="inputbox" value="Search" onfocus="if (value =='Search'){value =''}" onblur="if (value ==''){value='Search'}">
+		</form>
+		<ul>
+      
+				
+        <li><a class="main-nav-link" href="/">Home</a></li>
+      
+				
+        <li><a class="main-nav-link" href="/archives">Archives</a></li>
+      
+		</ul>
+	</nav>
+</header>
+    <section id="main" class="clearfix"><article class="post-detail">
+  <h1 class="post-title"><a href="/">namelist_wrf_parameter</a></h1>
+  <ul class="post-meta">
+  <li><i class="fa fa-user"></i> Author kopaba</li>
+  <li><i class="fa fa-calendar"></i> Date 9月 14</li>
+  <li><i class="fa fa-folder"></i> Categories
+  
+    no_categories
+  
+  </li>
+</ul>
+  <div class="post-content">
+      
+      <h1 id="WRF中namelist参数化方案选项说明"><a href="#WRF中namelist参数化方案选项说明" class="headerlink" title="WRF中namelist参数化方案选项说明"></a>WRF中namelist参数化方案选项说明</h1><h2 id="amp-physics"><a href="#amp-physics" class="headerlink" title="&amp;physics"></a>&amp;physics</h2><h3 id="mp-physics-微物理参数化方案-加粗数字代表选项编号"><a href="#mp-physics-微物理参数化方案-加粗数字代表选项编号" class="headerlink" title="mp_physics 微物理参数化方案 (加粗数字代表选项编号)"></a>mp_physics 微物理参数化方案 (加粗数字代表选项编号)</h3><ul>
+<li><em>Kessler scheme</em> 暖雨（无冰）方案，一般用在理想云模型中 <strong>1</strong></li>
+<li><em>Purdue Lin scheme</em> 有冰、雪和霰过程，适合真实数据高分辨率模拟 <strong>2</strong></li>
+<li><em>WRF Single-Moment 3-calss cheme</em> 适用于中尺度网格带有冰雪过程的简单高效方案 <strong>3</strong></li>
+<li><em>WRF Single-Moment 5-class scheme</em> 较上一方案稍微复杂，允许混合相过程和过冷水 <strong>4</strong></li>
+<li><em>Eta microphysics</em> 一个带有诊断性混合相过程的简单方案，细网格使用<strong>5</strong>粗网格使用<strong>95</strong></li>
+<li><em>WRF Single-Moment 6-class scheme</em> 带有冰雪和霰过程适用于高分辨率的模拟 <strong>6</strong></li>
+<li><em>Goddard microphysics scheme</em> 带有冰雪和霰过程适用于高分辨模拟 <strong>7</strong></li>
+<li><em>New Thompson scheme</em> 带有冰雪和霰过程，添加了降水集中度。<strong>8</strong></li>
+<li><em>Milbrandt-Yau Double-Moment 7-class scheme</em> 使用包括了冰雹和霰的不同类别</li>
+</ul>
+
+  </div>
+  
+    <div class="tags">
+    <span><i class="fa fa-tags"></i> Tags</span>
+      
+        <ul class="post-tag-list"><li class="post-tag-list-item"><a class="post-tag-list-link" href="/tags/wrf/">-wrf</a></li></ul>
+      
+    </div>
+  
+
+</article>
+
+<!-- Comments -->
+
+<!-- End Comments --></section>
+    <footer id="footer" role="contentinfo">
+    <div>&copy; 2024 <a href="/">Kopaba</a>.
+    Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Designed by <a href="http://rainylog.com" target="_blank">Rainy.</a>
+	</div>
+</footer><!-- end #footer -->
+
+  </div>
+  <script src="/lib/fancybox/dist/jquery.fancybox.min.js"></script>
+
+  <script src="/js/helper.js"></script>
+  <script src="/js/_third-party/gitment.js"></script>
+</body>
+</html>

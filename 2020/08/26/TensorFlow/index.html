@@ -13,7 +13,7 @@
 <meta property="og:site_name" content="Kopaba">
 <meta property="og:description" content="debugmodule ‘tensorflow’ has no attribute ‘Session’(已修复)在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch import tensorflow as tf tf.compat.v1.disable_eager_execution() config">
 <meta property="og:locale" content="zh-CN">
-<meta property="og:updated_time" content="2020-10-15T11:18:12.000Z">
+<meta property="og:updated_time" content="2023-09-16T08:27:34.235Z">
 <meta name="twitter:card" content="summary">
 <meta name="twitter:title" content="TensorFlow1.x学习笔记">
 <meta name="twitter:description" content="debugmodule ‘tensorflow’ has no attribute ‘Session’(已修复)在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch import tensorflow as tf tf.compat.v1.disable_eager_execution() config">
@@ -140,6 +140,7 @@ g <span class="token operator">=</span> tf<span class="token punctuation">.</spa
 <pre class="line-numbers language-pyhton"><code class="language-pyhton">with tf.name_scope('loss') as scope:
 loss = tf.nn.sigmoid_cross_entropy_with_logits(labels = y_true , logits = y_pred)
 loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
+<p>参数</p>
 <h2 id="CNN"><a href="#CNN" class="headerlink" title="CNN"></a>CNN</h2><p>层中的神经元只与前一层中的一小块区域连接，而不是采取全连接方式，主要由输入层，卷积层，ReLU层，池化层和全连接层构成(一般将卷积层和ReLU层一起称为卷积层)具体说来，卷积层和全连接层（CONV/FC）对输入执行变换操作的时候，不仅会用到激活函数，还会用到很多参数，即神经元的权值w和偏差b；而ReLU层和池化层则是进行一个固定不变的函数操作。卷积层和全连接层中的参数会随着梯度下降被训练，这样卷积神经网络计算出的分类评分就能和训练集中的每个图像的标签吻合了。</p>
 <h3 id="卷积层"><a href="#卷积层" class="headerlink" title="卷积层"></a>卷积层</h3><p>参数由一些可学习的滤波器集合构成，只观察输入数据中的一小部分，由于卷积有“权值共享”这样的特性，可以降低参数的数量，防止参数过多造成过拟合。每个神经元连接的空间大小叫做神经元的感受野，深度与输入相同，但宽高是局部的。输出数据体和使用的滤波器的数量一致，将沿着深度方向排列。有时候在输入数据体的边缘使用0进行填充，使得滤波器可以平滑地在数据上滑动，一般是用来保持数据体的空间尺寸使输入输出宽高相同。如果在一个深度切片中的所有权重都使用同一个权重向量，那么卷积层的前向传播在每个深度切片中可以看做是在计算神经元权重和输入数据体的卷积（这就是“卷积层”名字由来）。这也是为什么总是将这些权重集合称为滤波器（filter）（或卷积核（kernel）），因为它们和输入进行了卷积。简单来说，就是一个在原始数据上以步长为长度不断移动的一个矩阵，层数与原始数据一致，将每个对应位置的数据进行乘积并且将每层的值相加，即为输出的一个数据，例如RGB通道下就是三层滤波器所得相加填入新的矩阵当中。</p>
 <h3 id="池化层"><a href="#池化层" class="headerlink" title="池化层"></a>池化层</h3><p>用来简化数据，减少计算量，有最大池化和平均池化，使用较多的是最大池化，通过找出某一个区域内的最大值/平均值来缩小数据，一般使用的参数是f=2，p=2 恰好为缩小数据为原来的一半，并且反向传播没有参数适用于池化，这一过程是静态过程，参数都是手动设定，或是交叉验证得到的，只用于简化数据，提取特征。</p>
@@ -225,7 +226,7 @@ accuracy <span class="token operator">=</span> tf<span class="token punctuation"
 
 <!-- End Comments --></section>
     <footer id="footer" role="contentinfo">
-    <div>&copy; 2023 <a href="/">Kopaba</a>.
+    <div>&copy; 2024 <a href="/">Kopaba</a>.
     Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Designed by <a href="http://rainylog.com" target="_blank">Rainy.</a>
 	</div>
 </footer><!-- end #footer -->

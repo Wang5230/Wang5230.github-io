@@ -56,6 +56,546 @@
   <article class="post">
       
         
+          <h1><a href="/2023/10/17/LES/">LES</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <p>SGS turbulent using 3D Smagorinsky-Lilly closure</p>
+
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
+          <h1><a href="/2023/09/27/era5-initializing-WRF/">era5 initializing WRF</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <h2 id="References"><a href="#References" class="headerlink" title="References"></a>References</h2><ol>
+<li><a href="https://valcap74.blogspot.com/2017/10/how-to-run-wrf-model-driven-by-era5-on.html?showComment=1524140953190#c5741939636532233503" target="_blank" rel="noopener">How to run the WRF model using ERA5 (on model levels) as initial and boundary conditions</a></li>
+<li><a href="https://software.ecmwf.int/wiki/display/OIFSUF/Grib+to+Netcdf+conversion" target="_blank" rel="noopener">Grib to Netcdf conversion</a></li>
+<li><a href="http://conorsweeneyucd.blogspot.com/2015/01/download-era-interim-data.html" target="_blank" rel="noopener">Download ERA-Interim data</a></li>
+<li><a href="http://bbs.06climate.com/forum.php?mod=viewthread&tid=60363&highlight=ERA5" target="_blank" rel="noopener">气象家园</a></li>
+</ol>
+<h2 id="Summarization"><a href="#Summarization" class="headerlink" title="Summarization"></a>Summarization</h2><ol>
+<li>Download</li>
+<li>Preprocess</li>
+<li>Automation</li>
+<li>Geogrid</li>
+<li>Ungrib</li>
+<li>Produce additional intermediate files</li>
+<li>Metgrid</li>
+</ol>
+<a id="more"></a>
+
+<h2 id="Download"><a href="#Download" class="headerlink" title="Download"></a>Download</h2><p>ERA5 data were downloaded as described in <a href="https://software.ecmwf.int/wiki/display/CKB/How+to+download+ERA5+data+via+the+ECMWF+Web+API" target="_blank" rel="noopener">How to download ERA5 data via the ECMWF Web API</a><br>Here I’m attaching scripts to download surface and model data:</p>
+<p>if you want to use analysis and one hour resolution, all you need to change are <code>data</code>, <code>area</code> and <code>target</code>. Otherwise, you should change as needed.</p>
+<p>This is a little different from downloading ERA-Interim data. ERA-Interim includes Geopotential and Land-sea mask in invariant field. ERA5 includes them in surface dataset. So, we just need to download surface data and model level data.</p>
+<h3 id="Surface-data-GetERA5-sfc-py"><a href="#Surface-data-GetERA5-sfc-py" class="headerlink" title="Surface data (GetERA5-sfc.py)"></a>Surface data (GetERA5-sfc.py)</h3><pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> ecmwfapi <span class="token keyword">import</span> ECMWFDataServer
+server <span class="token operator">=</span> ECMWFDataServer<span class="token punctuation">(</span><span class="token punctuation">)</span>
+server<span class="token punctuation">.</span>retrieve<span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token string">'class'</span><span class="token punctuation">:</span><span class="token string">'ea'</span><span class="token punctuation">,</span>
+    <span class="token string">'dataset'</span><span class="token punctuation">:</span><span class="token string">'era5'</span><span class="token punctuation">,</span>
+    <span class="token string">'area'</span><span class="token punctuation">:</span><span class="token string">'Nort/West/Sout/East'</span><span class="token punctuation">,</span>
+    <span class="token string">'date'</span><span class="token punctuation">:</span><span class="token string">'DATE1/to/DATE2'</span><span class="token punctuation">,</span>
+    <span class="token string">'expver'</span><span class="token punctuation">:</span><span class="token string">'1'</span><span class="token punctuation">,</span>
+    <span class="token string">'levtype'</span><span class="token punctuation">:</span><span class="token string">'sfc'</span><span class="token punctuation">,</span>
+    <span class="token string">'param'</span><span class="token punctuation">:</span><span class="token string">'msl/skt/2t/10u/10v/2d/z/lsm/sst/ci/sd/stl1/stl2/stl3/stl4/swvl1/swvl2/swvl3/swvl4'</span><span class="token punctuation">,</span>  
+    <span class="token string">'stream'</span><span class="token punctuation">:</span><span class="token string">'oper'</span><span class="token punctuation">,</span>
+    <span class="token string">'time'</span><span class="token punctuation">:</span><span class="token string">'00:00:00/01:00:00/02:00:00/03:00:00/04:00:00/05:00:00/06:00:00/07:00:00/08:00:00/09:00:00/10:00:00/11:00:00/12:00:00/13:00:00/14:00:00/15:00:00/16:00:00/17:00:00/18:00:00/19:00:00/20:00:00/21:00:00/22:00:00/23:00:00'</span><span class="token punctuation">,</span>
+    <span class="token string">'type'</span><span class="token punctuation">:</span><span class="token string">'an'</span><span class="token punctuation">,</span>
+    <span class="token string">'target'</span><span class="token punctuation">:</span><span class="token string">'ERA5-DATE1-DATE2-sfc.grb'</span><span class="token punctuation">,</span>
+    <span class="token string">'grid'</span><span class="token punctuation">:</span><span class="token string">"0.25/0.25"</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h3 id="Model-level-data-GetERA5-ml-py"><a href="#Model-level-data-GetERA5-ml-py" class="headerlink" title="Model level data (GetERA5-ml.py)"></a>Model level data (GetERA5-ml.py)</h3><pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> ecmwfapi <span class="token keyword">import</span> ECMWFDataServer
+server <span class="token operator">=</span> ECMWFDataServer<span class="token punctuation">(</span><span class="token punctuation">)</span>
+server<span class="token punctuation">.</span>retrieve<span class="token punctuation">(</span><span class="token punctuation">{</span>
+    <span class="token string">'class'</span><span class="token punctuation">:</span><span class="token string">'ea'</span><span class="token punctuation">,</span>
+    <span class="token string">'dataset'</span><span class="token punctuation">:</span><span class="token string">'era5'</span><span class="token punctuation">,</span>
+    <span class="token string">'area'</span><span class="token punctuation">:</span><span class="token string">'Nort/West/Sout/East'</span><span class="token punctuation">,</span>
+    <span class="token string">'date'</span><span class="token punctuation">:</span><span class="token string">'DATE1/to/DATE2'</span><span class="token punctuation">,</span>
+    <span class="token string">'expver'</span><span class="token punctuation">:</span><span class="token string">'1'</span><span class="token punctuation">,</span>
+    <span class="token string">'levelist'</span><span class="token punctuation">:</span> <span class="token string">'1/to/137'</span><span class="token punctuation">,</span>
+    <span class="token string">'levtype'</span><span class="token punctuation">:</span><span class="token string">'ml'</span><span class="token punctuation">,</span>
+    <span class="token string">'param'</span><span class="token punctuation">:</span><span class="token string">'129/130/131/132/133/152'</span><span class="token punctuation">,</span>
+    <span class="token string">'stream'</span><span class="token punctuation">:</span><span class="token string">'oper'</span><span class="token punctuation">,</span>
+    <span class="token string">'time'</span><span class="token punctuation">:</span><span class="token string">'00:00:00/01:00:00/02:00:00/03:00:00/04:00:00/05:00:00/06:00:00/07:00:00/08:00:00/09:00:00/10:00:00/11:00:00/12:00:00/13:00:00/14:00:00/15:00:00/16:00:00/17:00:00/18:00:00/19:00:00/20:00:00/21:00:00/22:00:00/23:00:00'</span><span class="token punctuation">,</span>
+    <span class="token string">'type'</span><span class="token punctuation">:</span><span class="token string">'an'</span><span class="token punctuation">,</span>
+    <span class="token string">'target'</span><span class="token punctuation">:</span><span class="token string">'ERA5-DATE1-DATE2-ml.grb'</span><span class="token punctuation">,</span>
+    <span class="token string">'grid'</span><span class="token punctuation">:</span><span class="token string">'0.25/0.25'</span><span class="token punctuation">,</span>
+<span class="token punctuation">}</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="Preprocess"><a href="#Preprocess" class="headerlink" title="Preprocess"></a>Preprocess</h2><h3 id="Install-eccodes-recommended-or-grib-api"><a href="#Install-eccodes-recommended-or-grib-api" class="headerlink" title="Install  eccodes (recommended) or grib_api"></a>Install  eccodes (recommended) or grib_api</h3><p>Install <a href="https://software.ecmwf.int/wiki/display/ECC/ecCodes+Home" target="_blank" rel="noopener">eccodes</a> or <a href="https://software.ecmwf.int/wiki/display/GRIB/Home" target="_blank" rel="noopener">grib_api</a> according to ECMWF.</p>
+<p>If you choose grib_api, you must install the new version of grib_api. Otherwise, you will get this error when using grib_set (e.g. grib_api Version 1.12.3):</p>
+<pre><code>GRIB_API ERROR   :  Key &quot;numberOfVerticalCoordinateValues&quot;: Trying to encode value of 276 but the maximum allowable value is 255 (number of bits=8)
+
+GRIB_API ERROR   :  unable to set NV=276 as long (Encoding invalid)
+GRIB_API ERROR   :  grib_set_values[0] deletePV (1) failed: Key/value not found
+GRIB_API ERROR   :  grib_set_values[1] edition (1) failed: Encoding invalid</code></pre><h3 id="Preprocess-surface-data-optional"><a href="#Preprocess-surface-data-optional" class="headerlink" title="Preprocess surface data (optional)"></a>Preprocess surface data (optional)</h3><pre class="line-numbers language-bash"><code class="language-bash"><span class="token keyword">echo</span> <span class="token string">'write "[centre]_[dataDate]_[dataType]_[levelType]_[step].grib[edition]";'</span> <span class="token operator">></span> split.rule  
+grib_filter split.rule your/surface_data/name<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<h3 id="Preprocess-model-level-data-necessary"><a href="#Preprocess-model-level-data-necessary" class="headerlink" title="Preprocess model level data (necessary)"></a>Preprocess model level data (necessary)</h3><pre class="line-numbers language-s"><code class="language-s">grib_set -s deletePV=1,edition=1 your/model_level_data/name your/model_level_data/name.grib1
+grib_filter split.rule your/model_level_data/name.grib1<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
+<p>Finally, you will get these files (the structure of filename is<br><code>[centre]_[dataDate]_[dataType]_[levelType]_[step].grib[edition]</code>):</p>
+<p>|– ecmf_20150531_an_ml_0.grib1<br>|– ecmf_20150531_an_sfc_0.grib1<br>|– ecmf_20150601_an_ml_0.grib1<br>|– ecmf_20150601_an_sfc_0.grib1</p>
+<p>Link_grib.csh all these files in your preprocessing working directory.</p>
+<h2 id="Automation-script-Download-Preprocess"><a href="#Automation-script-Download-Preprocess" class="headerlink" title="Automation script (Download + Preprocess)"></a>Automation script (Download + Preprocess)</h2><p>You can automate the script rather than change elements one by one (as suggested by <a href="http://conorsweeneyucd.blogspot.com/2015/01/download-era-interim-data.html" target="_blank" rel="noopener">Conor</a>).</p>
+<pre class="line-numbers language-bash"><code class="language-bash"><span class="token shebang important">#!/bin/bash</span> -l
+
+CODEDIR<span class="token operator">=</span>/nuist/u/home/yinyan/xin/scratch/data/ERA5/code
+DATADIR<span class="token operator">=</span>/nuist/u/home/yinyan/xin/scratch/data/ERA5/data
+
+<span class="token comment" spellcheck="true"># Set your python environment</span>
+<span class="token function">export</span> PATH<span class="token operator">=</span>~/xin/work/anaconda3/bin:<span class="token variable">$PATH</span>
+<span class="token function">source</span> activate root
+
+<span class="token function">cd</span> <span class="token variable">$CODEDIR</span>
+
+DATE1<span class="token operator">=</span>20170419
+DATE2<span class="token operator">=</span>20170420
+Nort<span class="token operator">=</span>90
+West<span class="token operator">=</span>0
+Sout<span class="token operator">=</span>-30
+East<span class="token operator">=</span>180
+
+YY1<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token keyword">echo</span> $DATE1 <span class="token operator">|</span> <span class="token function">cut</span> -c1-4<span class="token variable">`</span></span>
+MM1<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token keyword">echo</span> $DATE1 <span class="token operator">|</span> <span class="token function">cut</span> -c5-6<span class="token variable">`</span></span>
+DD1<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token keyword">echo</span> $DATE1 <span class="token operator">|</span> <span class="token function">cut</span> -c7-8<span class="token variable">`</span></span>
+
+YY2<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token keyword">echo</span> $DATE2 <span class="token operator">|</span> <span class="token function">cut</span> -c1-4<span class="token variable">`</span></span>
+MM2<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token keyword">echo</span> $DATE2 <span class="token operator">|</span> <span class="token function">cut</span> -c5-6<span class="token variable">`</span></span>
+DD2<span class="token operator">=</span><span class="token variable"><span class="token variable">`</span><span class="token keyword">echo</span> $DATE2 <span class="token operator">|</span> <span class="token function">cut</span> -c7-8<span class="token variable">`</span></span>
+
+<span class="token function">sed</span> -e <span class="token string">"s/DATE1/<span class="token variable">${DATE1}</span>/g;s/DATE2/<span class="token variable">${DATE2}</span>/g;s/Nort/<span class="token variable">${Nort}</span>/g;s/West/<span class="token variable">${West}</span>/g;s/Sout/<span class="token variable">${Sout}</span>/g;s/East/<span class="token variable">${East}</span>/g;"</span> GetERA5-sfc.py <span class="token operator">></span> GetERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-sfc.py
+
+python GetERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-sfc.py
+
+<span class="token function">sed</span> -e <span class="token string">"s/DATE1/<span class="token variable">${DATE1}</span>/g;s/DATE2/<span class="token variable">${DATE2}</span>/g;s/Nort/<span class="token variable">${Nort}</span>/g;s/West/<span class="token variable">${West}</span>/g;s/Sout/<span class="token variable">${Sout}</span>/g;s/East/<span class="token variable">${East}</span>/g;"</span> GetERA5-ml.py <span class="token operator">></span> GetERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-ml.py
+
+python GetERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-ml.py
+
+<span class="token function">mkdir</span> -p <span class="token variable">${DATADIR}</span>/<span class="token variable">$YY1</span>
+
+<span class="token function">mv</span> ERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-sfc.grb ERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-ml.grb <span class="token variable">${DATADIR}</span>/<span class="token variable">$YY1</span>/
+
+<span class="token function">cd</span> <span class="token variable">${DATADIR}</span>/<span class="token variable">$YY1</span>/
+
+<span class="token keyword">echo</span> <span class="token string">'write "[centre]_[dataDate]_[dataType]_[levelType]_[step].grib[edition]";'</span> <span class="token operator">></span> split.rule
+grib_filter split.rule ERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-sfc.grb
+grib_set -s deletePV<span class="token operator">=</span>1,edition<span class="token operator">=</span>1 ERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-ml.grb ERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-ml.grib1
+grib_filter split.rule ERA5-<span class="token variable">${DATE1}</span>-<span class="token variable">${DATE2}</span>-ml.grib1
+
+<span class="token comment" spellcheck="true"># If you want to delete original files, you can uncomment the following line.</span>
+<span class="token comment" spellcheck="true"># rm *grb</span>
+
+<span class="token keyword">exit</span> 0<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="Geogrid"><a href="#Geogrid" class="headerlink" title="Geogrid"></a>Geogrid</h2><p>run geogrid.exe as usual</p>
+<h2 id="Ungrib"><a href="#Ungrib" class="headerlink" title="Ungrib"></a>Ungrib</h2><p>run ungrib.exe by using the following Vtable (as suggested by <a href="https://valcap74.blogspot.com/2017/10/how-to-run-wrf-model-driven-by-era5-on.html?showComment=1524140953190#c5741939636532233503" target="_blank" rel="noopener">valerio</a>):</p>
+<pre class="line-numbers language-s"><code class="language-s">GRIB | Level| Level| Level| metgrid | metgrid | metgrid                 |
+Code | Code |  1 |  2 | Name   | Units  | Description               |
+-----+------+------+------+----------+----------+------------------------------------------+  
+ 130 | 109 |  * |   | TT    | K    | Temperature               |
+ 131 | 109 |  * |   | UU    | m s-1  | U                    |
+ 132 | 109 |  * |   | VV    | m s-1  | V                    |
+ 133 | 109 |  * |   | SPECHUMD | kg kg-1 | Specific humidity            |
+ 152 | 109 |  * |   | LOGSFP  | Pa    | Log surface pressure           |
+ 157 | 109 |  * |   | RHUM   | %    | Relative humidity            |
+ 129 | 1  |  0 |   | SOILGEO | m    |                     |
+   | 1  |  0 |   | SOILHGT | m    | Terrain field of source analysis     |   
+ 165 | 1  |  0 |   | UU    | m s-1  | U                    | At 10 m   
+ 166 | 1  |  0 |   | VV    | m s-1  | V                    | At 10 m   
+ 167 | 1  |  0 |   | TT    | K    | Temperature               | At 2 m   
+ 168 | 1  |  0 |   | DEWPT  | K    |                     | At 2 m   
+   | 1  |  0 |   | RH    | %    | Relative Humidity at 2 m         | At 2 m   
+ 172 | 1  |  0 |   | LANDSEA | 0/1 Flag | Land/Sea flag              |
+ 134 | 1  |  0 |   | PSFC   | Pa    | Surface Pressure             |
+ 134 | 109 |  1 |   | PSFCH  | Pa    |                     |
+ 151 | 1  |  0 |   | PMSL   | Pa    | Sea-level Pressure            |
+ 235 | 1  |  0 |   | SKINTEMP | K    | Sea-Surface Temperature         |
+ 31 | 1  |  0 |   | SEAICE  | 0/1 Flag | Sea-Ice-Flag               |
+ 34 | 1  |  0 |   | SST   | K    | Sea-Surface Temperature         |
+ 141 | 1  |  0 |   | SNOW_EC | m    |                     |
+   | 1  |  0 |   | SNOW   | kg m-2  |Water Equivalent of Accumulated Snow Depth|  
+ 139 | 112 |  0 |  7 | ST000007 | K    | T of 0-7 cm ground layer         |
+ 170 | 112 |  7 | 28 | ST007028 | K    | T of 7-28 cm ground layer        |
+ 183 | 112 | 28 | 100 | ST028100 | K    | T of 28-100 cm ground layer       |
+ 236 | 112 | 100 | 255 | ST100255 | K    | T of 100-255 cm ground layer       |
+ 39 | 112 |  0 |  7 | SM000007 | fraction | Soil moisture of 0-7 cm ground layer   |   
+ 40 | 112 |  7 | 28 | SM007028 | fraction | Soil moisture of 7-28 cm ground layer  |   
+ 41 | 112 | 28 | 100 | SM028100 | fraction | Soil moisture of 28-100 cm ground layer |   
+ 42 | 112 | 100 | 255 | SM100255 | fraction | Soil moisture of 100-255 cm ground layer |   
+-----+------+------+------+----------+----------+------------------------------------------+<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="Produce-additional-intermediate-files"><a href="#Produce-additional-intermediate-files" class="headerlink" title="Produce additional intermediate files"></a>Produce additional intermediate files</h2><p>Create the following ecmwf_coeffs table (named ecmwf_coeffs) and run */WPS/util/calc_ecmwf_p.exe:</p>
+<pre class="line-numbers language-s"><code class="language-s">0 0.000000 0.00000000  
+1 2.000365 0.00000000  
+2 3.102241 0.00000000  
+3 4.666084 0.00000000  
+4 6.827977 0.00000000  
+5 9.746966 0.00000000  
+6 13.605424 0.00000000  
+7 18.608931 0.00000000  
+8 24.985718 0.00000000  
+9 32.985710 0.00000000  
+10 42.879242 0.00000000  
+11 54.955463 0.00000000  
+12 69.520576 0.00000000  
+13 86.895882 0.00000000  
+14 107.415741 0.00000000  
+15 131.425507 0.00000000  
+16 159.279404 0.00000000  
+17 191.338562 0.00000000  
+18 227.968948 0.00000000  
+19 269.539581 0.00000000  
+20 316.420746 0.00000000  
+21 368.982361 0.00000000  
+22 427.592499 0.00000000  
+23 492.616028 0.00000000  
+24 564.413452 0.00000000  
+25 643.339905 0.00000000  
+26 729.744141 0.00000000  
+27 823.967834 0.00000000  
+28 926.344910 0.00000000  
+29 1037.201172 0.00000000  
+30 1156.853638 0.00000000  
+31 1285.610352 0.00000000  
+32 1423.770142 0.00000000  
+33 1571.622925 0.00000000  
+34 1729.448975 0.00000000  
+35 1897.519287 0.00000000  
+36 2076.095947 0.00000000  
+37 2265.431641 0.00000000  
+38 2465.770508 0.00000000  
+39 2677.348145 0.00000000  
+40 2900.391357 0.00000000  
+41 3135.119385 0.00000000  
+42 3381.743652 0.00000000  
+43 3640.468262 0.00000000  
+44 3911.490479 0.00000000  
+45 4194.930664 0.00000000  
+46 4490.817383 0.00000000  
+47 4799.149414 0.00000000  
+48 5119.895020 0.00000000  
+49 5452.990723 0.00000000  
+50 5798.344727 0.00000000  
+51 6156.074219 0.00000000  
+52 6526.946777 0.00000000  
+53 6911.870605 0.00000000  
+54 7311.869141 0.00000000  
+55 7727.412109 0.00000700  
+56 8159.354004 0.00002400  
+57 8608.525391 0.00005900  
+58 9076.400391 0.00011200  
+59 9562.682617 0.00019900  
+60 10065.978516 0.00034000  
+61 10584.631836 0.00056200  
+62 11116.662109 0.00089000  
+63 11660.067383 0.00135300  
+64 12211.547852 0.00199200  
+65 12766.873047 0.00285700  
+66 13324.668945 0.00397100  
+67 13881.331055 0.00537800  
+68 14432.139648 0.00713300  
+69 14975.615234 0.00926100  
+70 15508.256836 0.01180600  
+71 16026.115234 0.01481600  
+72 16527.322266 0.01831800  
+73 17008.789062 0.02235500  
+74 17467.613281 0.02696400  
+75 17901.621094 0.03217600  
+76 18308.433594 0.03802600  
+77 18685.718750 0.04454800  
+78 19031.289062 0.05177300  
+79 19343.511719 0.05972800  
+80 19620.042969 0.06844800  
+81 19859.390625 0.07795800  
+82 20059.931641 0.08828600  
+83 20219.664062 0.09946200  
+84 20337.863281 0.11150500  
+85 20412.308594 0.12444800  
+86 20442.078125 0.13831300  
+87 20425.718750 0.15312500  
+88 20361.816406 0.16891000  
+89 20249.511719 0.18568900  
+90 20087.085938 0.20349100  
+91 19874.025391 0.22233300  
+92 19608.572266 0.24224400  
+93 19290.226562 0.26324200  
+94 18917.460938 0.28535400  
+95 18489.707031 0.30859800  
+96 18006.925781 0.33293900  
+97 17471.839844 0.35825400  
+98 16888.687500 0.38436300  
+99 16262.046875 0.41112500  
+100 15596.695312 0.43839100  
+101 14898.453125 0.46600300  
+102 14173.324219 0.49380000  
+103 13427.769531 0.52161900  
+104 12668.257812 0.54930100  
+105 11901.339844 0.57669200  
+106 11133.304688 0.60364800  
+107 10370.175781 0.63003600  
+108 9617.515625 0.65573600  
+109 8880.453125 0.68064300  
+110 8163.375000 0.70466900  
+111 7470.343750 0.72773900  
+112 6804.421875 0.74979700  
+113 6168.531250 0.77079800  
+114 5564.382812 0.79071700  
+115 4993.796875 0.80953600  
+116 4457.375000 0.82725600  
+117 3955.960938 0.84388100  
+118 3489.234375 0.85943200  
+119 3057.265625 0.87392900  
+120 2659.140625 0.88740800  
+121 2294.242188 0.89990000  
+122 1961.500000 0.91144800  
+123 1659.476562 0.92209600  
+124 1387.546875 0.93188100  
+125 1143.250000 0.94086000  
+126 926.507812 0.94906400  
+127 734.992188 0.95655000  
+128 568.062500 0.96335200  
+129 424.414062 0.96951300  
+130 302.476562 0.97507800  
+131 202.484375 0.98007200  
+132 122.101562 0.98454200  
+133 62.781250 0.98850000  
+134 22.835938 0.99198400  
+135 3.757813 0.99500300  
+136 0.000000 0.99763000  
+137 0.000000 1.00000000<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<h2 id="Metgrid"><a href="#Metgrid" class="headerlink" title="Metgrid"></a>Metgrid</h2><p>Edit namelist.wps like this:</p>
+<pre class="line-numbers language-s"><code class="language-s">&ungrib
+out_format = 'WPS',
+prefix = 'FILE',
+/
+
+&metgrid
+fg_name = 'FILE','PRES'
+io_form_metgrid = 2,<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>If you just run metgrid.exe, you’ll get these warnings:</p>
+<pre><code>WARNING: Entry in METGRID.TBL not found for field ST100255. Default options will be used for this field!
+WARNING: Entry in METGRID.TBL not found for field SM100255. Default options will be used for this field!
+WARNING: Entry in METGRID.TBL not found for field LOGSFP. Default options will be used for this field!</code></pre><p>You can edit METGRID.TBL to set interpolation method of <code>ST100255</code> <code>SM100255</code> and <code>LOGSFP</code>: </p>
+<pre class="line-numbers language-s"><code class="language-s">========================================
+name=ST
+        z_dim_name=num_st_layers
+        derived=yes
+        ....
+# ELSE IF
+        fill_lev =   7 : ST000007(200100)
+        fill_lev =  28 : ST007028(200100)
+        fill_lev = 100 : ST028100(200100)
+        fill_lev = 255 : ST100255(200100)
+        ....
+========================================
+name=SM
+        z_dim_name=num_sm_layers
+        derived=yes
+        ....
+# ELSE IF
+        fill_lev =   7 : SM000007(200100)
+        fill_lev =  28 : SM007028(200100)
+        fill_lev = 100 : SM028100(200100)
+        fill_lev = 255 : SM100255(200100)
+        ....
+....
+....
+========================================
+name=SM100255
+        interp_option=sixteen_pt+four_pt+wt_average_4pt+wt_average_16pt+search
+        masked=water
+        interp_mask=LANDSEA(0)
+        missing_value=-1.E30
+        fill_missing=1.
+        flag_in_output=FLAG_SM100255
+========================================
+....
+....
+========================================
+name=ST100255
+        interp_option=sixteen_pt+four_pt+wt_average_4pt+wt_average_16pt+search
+        masked=water
+        interp_mask=LANDSEA(0)
+        missing_value=-1.E30
+        fill_missing=285.
+        flag_in_output=FLAG_ST100255
+========================================
+....
+....
+========================================
+name=LOGSFP
+        interp_option=four_pt+average_4pt
+        fill_lev=200100:PSFC(200100.)
+        flag_in_output=FLAG_LOGSFP
+========================================<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>Run metgrid.exe with the modified METGRID.TBL.ARW table.</p>
+<h2 id="Note-of-mozbc"><a href="#Note-of-mozbc" class="headerlink" title="Note of mozbc"></a>Note of mozbc</h2><p>If you’re using MOZART in WRF-Chem, then you need to change LOGSFP field in met* files to PSFC:</p>
+<pre><code>$ for i in met*; do ncap2 -s &#39;PSFC=exp(LOGSFP)&#39; &quot;$i&quot; &quot;$i&quot;_tmp; done
+After checking tmp files:
+$ rename nc_tmp nc *.nc_tmp</code></pre>
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
+          <h1><a href="/2023/09/14/namelist-wrf-parameter/">namelist_wrf_parameter</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <h1 id="WRF中namelist参数化方案选项说明"><a href="#WRF中namelist参数化方案选项说明" class="headerlink" title="WRF中namelist参数化方案选项说明"></a>WRF中namelist参数化方案选项说明</h1><h2 id="amp-physics"><a href="#amp-physics" class="headerlink" title="&amp;physics"></a>&amp;physics</h2><h3 id="mp-physics-微物理参数化方案-加粗数字代表选项编号"><a href="#mp-physics-微物理参数化方案-加粗数字代表选项编号" class="headerlink" title="mp_physics 微物理参数化方案 (加粗数字代表选项编号)"></a>mp_physics 微物理参数化方案 (加粗数字代表选项编号)</h3><ul>
+<li><em>Kessler scheme</em> 暖雨（无冰）方案，一般用在理想云模型中 <strong>1</strong></li>
+<li><em>Purdue Lin scheme</em> 有冰、雪和霰过程，适合真实数据高分辨率模拟 <strong>2</strong></li>
+<li><em>WRF Single-Moment 3-calss cheme</em> 适用于中尺度网格带有冰雪过程的简单高效方案 <strong>3</strong></li>
+<li><em>WRF Single-Moment 5-class scheme</em> 较上一方案稍微复杂，允许混合相过程和过冷水 <strong>4</strong></li>
+<li><em>Eta microphysics</em> 一个带有诊断性混合相过程的简单方案，细网格使用<strong>5</strong>粗网格使用<strong>95</strong></li>
+<li><em>WRF Single-Moment 6-class scheme</em> 带有冰雪和霰过程适用于高分辨率的模拟 <strong>6</strong></li>
+<li><em>Goddard microphysics scheme</em> 带有冰雪和霰过程适用于高分辨模拟 <strong>7</strong></li>
+<li><em>New Thompson scheme</em> 带有冰雪和霰过程，添加了降水集中度。<strong>8</strong></li>
+<li><em>Milbrandt-Yau Double-Moment 7-class scheme</em> 使用包括了冰雹和霰的不同类别</li>
+</ul>
+
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
+          <h1><a href="/2023/08/29/figure-draw-py/">figure_draw_py</a></h1>
+        
+      
+      <div class="post-content ">
+        
+  
+
+
+
+
+        <h1 id="python绘图"><a href="#python绘图" class="headerlink" title="python绘图"></a>python绘图</h1><h2 id="环境配置与IDE配置"><a href="#环境配置与IDE配置" class="headerlink" title="环境配置与IDE配置"></a>环境配置与IDE配置</h2><ul>
+<li>python环境安装可通过<a href="https://www.python.org/downloads/" target="_blank" rel="noopener">直接下载</a>或者通过包管理器<a href="https://www.anaconda.com/download" target="_blank" rel="noopener">anaconda</a>下载，这里更推荐使用anaconda可以搭建多个不同版本的python环境且彼此不受影响,两种方法下载后均会自动配置好环境变量，不需要下一步操作。后续介绍主要围绕<em>anaconda+vscode</em>的配置来介绍。</li>
+<li>conda创建环境需要打开anaconda prompt来创建，常用的conda命令如下<ul>
+<li><em>conda env list</em> 列出目前已有的环境</li>
+<li><em>conda create -n env_name python=3.x.x</em> 创建名称为env_name版本为3.x.x的python环境</li>
+<li><em>conda activate env_name</em> 进入env_name的环境  deactivate 退出环境</li>
+<li>在进入某一环境后可以通过<em>conda install xxx</em>来下载不同的包，原理与pip相同</li>
+</ul>
+</li>
+<li>IDE使用<a href="https://code.visualstudio.com/download" target="_blank" rel="noopener">vscode</a>，下载好后在任意一个目录下创建python文件后，在右下角选择已经创建好的conda环境即可<h2 id="常用包"><a href="#常用包" class="headerlink" title="常用包"></a>常用包</h2></li>
+</ul>
+<ol>
+<li><em>numpy</em> 数据处理包，主要使用其中创建空数组或是对数组进行布尔逻辑索引等操作</li>
+<li><em>matplotlib</em> python中绘图最主要的包</li>
+<li><em>xarray</em> 可以读取.nc等带有表头格式的文件</li>
+<li><em>cartopy</em> 主要进行地图绘制的包</li>
+<li><em>netCDF4</em> 可以读取nc格式文件并将读取出来的文件转换为ndarray即numpy数组</li>
+<li><em>scipy</em> 包含许多统计变量的计算函数</li>
+<li><em>h5py</em> 读取HDF格式文件，读取后变为Dataset格式，通过提取变量变为ndarray</li>
+<li><em>shapefile</em> 与shp文件相关的地图绘制</li>
+</ol>
+<h2 id="绘图基本流程与常用函数"><a href="#绘图基本流程与常用函数" class="headerlink" title="绘图基本流程与常用函数"></a>绘图基本流程与常用函数</h2><p>以绘制GPM降水资料在甘肃的分布为例</p>
+<ol>
+<li>读取数据<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> h5py
+file <span class="token operator">=</span> <span class="token string">'path_to_GPM_file'</span>
+Dataset <span class="token operator">=</span> h5py<span class="token punctuation">.</span>File<span class="token punctuation">(</span>file<span class="token punctuation">)</span>
+lon <span class="token operator">=</span> Dataset<span class="token punctuation">[</span><span class="token string">'/Grid/lon'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true">#不同的二进制文件中变量关键词不同，变量组关系不同，可使用ncdump -h 先查看文件变量组在读取</span>
+lat <span class="token operator">=</span> Dataset<span class="token punctuation">[</span><span class="token string">'/Grid/lat'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span> <span class="token comment" spellcheck="true">#这里使用[:]是为了只将变量中的数据取出，而不包含变量的头信息等</span>
+prec <span class="token operator">=</span> Dataset<span class="token punctuation">[</span><span class="token string">'Grid/precipitationCal'</span><span class="token punctuation">]</span><span class="token punctuation">[</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token operator">/</span><span class="token number">2</span> <span class="token comment" spellcheck="true">#由于GPM是逐半小时的降雨率</span>
+prec <span class="token operator">=</span> prec<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token punctuation">:</span><span class="token punctuation">,</span><span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">.</span>transpose<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#由于GPM资料是time*lon*lat，需要转化为lat*lon再绘图</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
+<li>控制数据区域</li>
+</ol>
+<p>由于GPM数据为全球范围，直接整体处理对内存与运行速度负载较大，可以通过python中numpy的特性<em>MaskedArray</em>与shp文件来限定其范围</p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
+<span class="token keyword">import</span> shapefile <span class="token keyword">as</span> shp
+mark <span class="token operator">=</span> np<span class="token punctuation">.</span>zeros<span class="token punctuation">(</span><span class="token punctuation">(</span><span class="token number">150</span><span class="token punctuation">,</span><span class="token number">200</span><span class="token punctuation">)</span><span class="token punctuation">,</span>dtype<span class="token operator">=</span>bool<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#创建一个布尔形式与数据大小相符的数组</span>
+shp_file <span class="token operator">=</span> shp<span class="token punctuation">.</span>Reader<span class="token punctuation">(</span><span class="token string">'Gansu.shp'</span><span class="token punctuation">)</span>
+rec <span class="token operator">=</span> shp_file<span class="token punctuation">.</span>shapeRecords<span class="token punctuation">(</span><span class="token punctuation">)</span>
+<span class="token keyword">for</span> r <span class="token keyword">in</span> rec<span class="token punctuation">:</span>
+    poly <span class="token operator">=</span> r<span class="token punctuation">.</span>shape    <span class="token comment" spellcheck="true">#.shape属性一般需要通过迭代内部才能取到</span>
+<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span>len<span class="token punctuation">(</span>lon<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">for</span> j <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span>len<span class="token punctuation">(</span>lat<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token comment" spellcheck="true">#通过便利格点，来确定其是否在给定的shp文件范围内部</span>
+        <span class="token keyword">if</span> geometry<span class="token punctuation">.</span>Point<span class="token punctuation">(</span><span class="token punctuation">[</span>lon<span class="token punctuation">[</span>i<span class="token punctuation">]</span><span class="token punctuation">,</span>lat<span class="token punctuation">[</span>j<span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">.</span>within<span class="token punctuation">(</span>geometry<span class="token punctuation">.</span>shape<span class="token punctuation">(</span>poly<span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
+            mark<span class="token punctuation">[</span>j<span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">True</span> <span class="token comment" spellcheck="true"># 根据shp文件结构不同，需要调整poly的结构，如这里使用的是甘肃省界shp文件，内部仅有一个多边形</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>到这里，mark数组就变为了在甘肃省内部为True，外部为False的一个标记数组，之后将经纬度网格点以及降水数据网格点取mark，即可绘制图像。这是python中较为常用的一个特性</p>
+<ol start="3">
+<li><p>绘图</p>
+<ul>
+<li>主要用到matplotlib下的pyplot包,<em>需要在画图时将图中出现的字体改为新罗马</em><pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> matplotlib <span class="token keyword">import</span> pyplot <span class="token keyword">as</span> plt <span class="token comment" spellcheck="true">#引入pyplot库</span>
+<span class="token keyword">import</span> matplotlib <span class="token keyword">as</span> mpl
+mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'font.family'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'sans-serif'</span>
+mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'font.sans-serif'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'Times New Roman'</span><span class="token punctuation">]</span>
+mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'axes.unicode_minus'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">False</span>
+mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'mathtext.fontset'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'stix'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
+</ul>
+</li>
+</ol>
+<ul>
+<li><p>主要的画图函数有</p>
+<pre class="line-numbers language-python"><code class="language-python">plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>x <span class="token operator">=</span> <span class="token punctuation">,</span>y <span class="token operator">=</span> <span class="token punctuation">,</span>color <span class="token operator">=</span> <span class="token punctuation">,</span>linestyle <span class="token operator">=</span> <span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#折线图 可指定线条颜色，线条形式(实线 solid、虚线 dashed...)</span>
+plt<span class="token punctuation">.</span>contourf<span class="token punctuation">(</span>x <span class="token operator">=</span> <span class="token punctuation">,</span> y <span class="token operator">=</span> <span class="token punctuation">,</span> z <span class="token operator">=</span> <span class="token punctuation">,</span> cmap <span class="token operator">=</span> <span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#填色图 z为每个格点上对应的值，注意，这里的xy必须为网格点数据，即不能是单一的xy一维序列，而是网格坐标，cmap可以修改填色所使用的colorbar</span>
+<span class="token keyword">import</span> matplotlib<span class="token punctuation">.</span>colors <span class="token keyword">as</span> mcolors
+clevs <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0.1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">15</span><span class="token punctuation">,</span><span class="token number">30</span><span class="token punctuation">,</span><span class="token number">50</span><span class="token punctuation">]</span>
+cdict <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'#00000000'</span><span class="token punctuation">,</span><span class="token string">'#A9F090'</span><span class="token punctuation">,</span><span class="token string">'#40B73F'</span><span class="token punctuation">,</span><span class="token string">'#63B7FF'</span><span class="token punctuation">,</span><span class="token string">'#0000FE'</span><span class="token punctuation">,</span><span class="token string">'#FF00FC'</span><span class="token punctuation">,</span><span class="token string">'#850042'</span><span class="token punctuation">]</span>
+prec_cmap <span class="token operator">=</span> mcolors<span class="token punctuation">.</span>ListedColormap<span class="token punctuation">(</span>cdict<span class="token punctuation">)</span>
+norm <span class="token operator">=</span> mpl<span class="token punctuation">.</span>colors<span class="token punctuation">.</span>BoundaryNorm<span class="token punctuation">(</span>clevs<span class="token punctuation">,</span>prec_cmap<span class="token punctuation">.</span>N<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#可以使用这种方式自定义cmap，同样可以在scatter图中使用</span>
+plt<span class="token punctuation">.</span>scatter<span class="token punctuation">(</span>x <span class="token operator">=</span> <span class="token punctuation">,</span> y <span class="token operator">=</span> <span class="token punctuation">,</span> c <span class="token operator">=</span> <span class="token punctuation">,</span> cmap <span class="token operator">=</span> <span class="token punctuation">,</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#注意，scatter中的xy与countourf不同，需为一维长度相等的数组，不可为二维网格</span>
+plt<span class="token punctuation">.</span>contour<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#等值线图 同contourf</span>
+plt<span class="token punctuation">.</span>bar<span class="token punctuation">(</span>x <span class="token operator">=</span> <span class="token punctuation">,</span> height <span class="token operator">=</span> <span class="token punctuation">,</span> width <span class="token operator">=</span> <span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#直方图 可以指定宽度或是高度随x而变化 </span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+</li>
+<li><p>绘图流程</p>
+</li>
+</ul>
+<p>可以通过plt直接调用几个函数直接进行绘制，或是通过</p>
+<pre class="line-numbers language-python"><code class="language-python">fig <span class="token operator">=</span> plt<span class="token punctuation">.</span>figure<span class="token punctuation">(</span>figsize<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">12</span><span class="token punctuation">,</span><span class="token number">8</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
+ax <span class="token operator">=</span> fig<span class="token punctuation">.</span>addsubplot<span class="token punctuation">(</span><span class="token number">111</span><span class="token punctuation">,</span>projection <span class="token operator">=</span> xxx<span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#这里的111是指一幅图，可以通过指定该参数来绘制组图如</span>
+ax1 <span class="token operator">=</span> fig<span class="token punctuation">.</span>addsubplot<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 此时添加了一副2*2的子图，并指定当前绘图区域在第一幅，即左上图，按照左到右，上到下排序</span>
+<span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
+<span class="token comment" spellcheck="true"># 在绘图结束后，可以调用</span>
+plt<span class="token punctuation">.</span>savefig<span class="token punctuation">(</span>fanme <span class="token operator">=</span> <span class="token punctuation">,</span> dpi <span class="token operator">=</span> <span class="token punctuation">,</span> Orientation <span class="token operator">=</span> <span class="token punctuation">,</span> format <span class="token operator">=</span> <span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 参数包括</span>
+<span class="token comment" spellcheck="true"># 或是</span>
+plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 在弹出的对话框中选择保存的形式</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<ul>
+<li>常用绘图工具函数</li>
+</ul>
+<ol>
+<li>经纬度显示转化</li>
+</ol>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> matplotlib<span class="token punctuation">.</span>ticker <span class="token keyword">import</span> FuncFormatter
+<span class="token keyword">def</span> <span class="token function">to_latitude</span><span class="token punctuation">(</span>temp<span class="token punctuation">,</span> position<span class="token punctuation">)</span><span class="token punctuation">:</span>
+    <span class="token keyword">return</span> <span class="token string">'%1.0f'</span><span class="token operator">%</span><span class="token punctuation">(</span>temp<span class="token punctuation">)</span> <span class="token operator">+</span> <span class="token string">'°N'</span>
+<span class="token keyword">def</span> <span class="token function">to_longtitude</span><span class="token punctuation">(</span>temp<span class="token punctuation">,</span>position<span class="token punctuation">)</span><span class="token punctuation">:</span> <span class="token comment" spellcheck="true">#通过占位符替换坐标轴显示形式，同理可以改写百分数</span>
+    <span class="token keyword">return</span> <span class="token string">'%1.0f'</span><span class="token operator">%</span><span class="token punctuation">(</span>temp<span class="token punctuation">)</span><span class="token operator">+</span> <span class="token string">'°E'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
+<p>需要在主函数，即绘图调用处加上,同理，改写百分制显示时只需要改写y轴显示形式即可</p>
+<pre class="line-numbers language-python"><code class="language-python">x_fomatter <span class="token operator">=</span> FuncFormatter<span class="token punctuation">(</span>to_longtitude<span class="token punctuation">)</span>
+y_fomatter <span class="token operator">=</span> FuncFormatter<span class="token punctuation">(</span>to_latitude<span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>gca<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>yaxis<span class="token punctuation">.</span>set_major_formatter<span class="token punctuation">(</span>y_fomatter<span class="token punctuation">)</span>
+plt<span class="token punctuation">.</span>gca<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>xaxis<span class="token punctuation">.</span>set_major_formatter<span class="token punctuation">(</span>x_fomatter<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
+
+      </div>
+  </article>
+
+  <article class="post">
+      
+        
           <h1><a href="/2023/03/15/py-in-met/">py in met</a></h1>
         
       
@@ -307,575 +847,6 @@ cx <span class="token operator">=</span> cmplx<span class="token punctuation">(<
       </div>
   </article>
 
-  <article class="post">
-      
-        
-          <h1><a href="/2020/09/05/Machine_learing/">MachineLearning</a></h1>
-        
-      
-      <div class="post-content ">
-        
-  
-
-
-
-
-        <h2 id="监督式学习"><a href="#监督式学习" class="headerlink" title="监督式学习"></a>监督式学习</h2><p>指目标给定标签来进行分类等例如聚类，分类问题等</p>
-<h2 id="无监督式学习"><a href="#无监督式学习" class="headerlink" title="无监督式学习"></a>无监督式学习</h2><p>指目标没有指定的标签，通过已有样本的特点来进行预测拟合，如回归分析</p>
-<h3 id="构成"><a href="#构成" class="headerlink" title="构成"></a>构成</h3><ol>
-<li><p>代价函数(一般为平方差等，表示拟合量与实际值的偏差)通过寻找代价函数与目标函数参数关系寻找到最小值来进行回归。</p>
-</li>
-<li><p>梯度下降法，通过遍历寻找在当前点梯度最大方向进行遍历，类似于贪心的思想，来降低代价函数值寻找局部最小值(注意，这里并不是全局的最小值)，越大的学习系数每一步的步长越长，需要注意的是每次要做到每个系数的同步跟新。<br>通过画出代价函数变化函数来确定是否收敛，一般在学习速率够小时，代价函数都会随着迭代而减小，但过小会导致收敛速度慢的问题</p>
-</li>
-<li><p>反向传播：包含两个阶段，激励传播与权重更新</p>
-<ul>
-<li>激励传播：包含两步，第一步前向传播阶段，将输入送入网络获得激励响应；第二部，求出代价函数，一般为方差获得输出层和隐藏层的误差</li>
-<li>权重更新：根据代价函数对于不同权重敏感程度以及各个激活值距离正确值的大小来决定，例如在有两个神经元一个激活值为0.2其期望值是1，一个是0.3其期望值是0，那么需要优先调整距离期望较大的神经元</li>
-<li></li>
-</ul>
-</li>
-</ol>
-
-      </div>
-  </article>
-
-  <article class="post">
-      
-        
-          <h1><a href="/2020/08/26/TensorFlow/">TensorFlow1.x学习笔记</a></h1>
-        
-      
-      <div class="post-content ">
-        
-  
-
-
-
-
-        <h2 id="debug"><a href="#debug" class="headerlink" title="debug"></a>debug</h2><h3 id="module-‘tensorflow’-has-no-attribute-‘Session’-已修复"><a href="#module-‘tensorflow’-has-no-attribute-‘Session’-已修复" class="headerlink" title="module ‘tensorflow’ has no attribute ‘Session’(已修复)"></a>module ‘tensorflow’ has no attribute ‘Session’(已修复)</h3><p>在新版本中Tensorflow 2.0版本中已经移除了Session这一模块，改换运行代码以及对于graph的语法皆以变化，语法近似pytorch</p>
-<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
-tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
-config <span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>ConfigProto<span class="token punctuation">(</span>allow_soft_placement<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-sess<span class="token operator">=</span> tf<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1<span class="token punctuation">.</span>Session<span class="token punctuation">(</span>config<span class="token operator">=</span>config<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span></span></code></pre>
-<h2 id="建立一个简单的回归分析模型"><a href="#建立一个简单的回归分析模型" class="headerlink" title="建立一个简单的回归分析模型"></a>建立一个简单的回归分析模型</h2><ol>
-<li>首先使用placeholder为输入与输出创建占位符，同时为权重和截距创建合适的变量</li>
-</ol>
-<pre class="line-numbers language-pyhton"><code class="language-pyhton">x = tf.placeholder(tf.float32 , shape = [None ,3]) #输入
-y_ture = tf.placeholder(tf.float32 , shape = None) #实际值
-w = tf.Variable([[0,0,0]] , dtype = tf.float32 , 
-name = 'weights')  #权重
-b = tf.Variable(0 , dtype = tf.float32 , name = 'bias') #截距
-y_pred = tf.matmul(w , tf.transpose(x)) + b #预测值<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ol start="2">
-<li>接下来，需要来评估模型的性能，为了刻画预测值与真实值的差异，需要订一个反应“距离”的度量，一般称为<strong>损失函数</strong>，通过寻找一组参数来最小化损失函数优化模型。一般使用<strong>MSE(均方差)和交叉熵</strong></li>
-</ol>
-<pre class="line-numbers language-pyhton"><code class="language-pyhton">#-----------------MRE
-loss = tf.reduce_mean(tf.square(y_ture - y_pred)) #MSE
-#----------------交叉熵
-loss = tf.nn.sigmod_cross_entropy_with_logits(lables = y_ture , logits = y_pred)
-loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<ol start="3">
-<li><p>接下来需要明白如何最小化损失函数，一般使用<strong>梯度下降法</strong>，尽管可能陷入局部最优，但是一般都是足够好的。</p>
-</li>
-<li><p>由于计算整个样本集合可能会很慢，所以需要使用一些采样方法，对样本的子集进行采样，一般规模在50~500个一次，过小的样本会使得硬件利用率降低，而且会使得<strong>目标函数</strong>产生较大的波动，但有时波动也是有益的，因为能够使得参数跳跃到新的局部最优值，TF中通过向图中添加新的操作然后使用自动差分来计算梯度，需要设置的就是学习率，来确定每次更新迭代的量，一般更倾向于设置较小的学习率，以防止跳过了局部最优解，但过低会导致损失函数减少的十分慢。</p>
-</li>
-</ol>
-<pre class="line-numbers language-python"><code class="language-python">optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>GradientDsecentOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
-train <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>loss<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span></span></code></pre>
-<h3 id="线性回归"><a href="#线性回归" class="headerlink" title="线性回归"></a>线性回归</h3><p>使用numpy生成数据，创建了三个特征向量样本，每个样本内积乘以一组权重加上偏差项再加上噪声得出结果，通过优化模型找到最佳参数</p>
-<pre class="line-numbers language-python"><code class="language-python">
-<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
-<span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1 <span class="token keyword">as</span> tf
-tf<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
-x_data <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">2000</span> <span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">)</span>
-w_real <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">0.3</span> <span class="token punctuation">,</span> <span class="token number">0.5</span> <span class="token punctuation">,</span> <span class="token number">0.1</span><span class="token punctuation">]</span>
-b_real <span class="token operator">=</span> <span class="token operator">-</span><span class="token number">0.2</span>
-
-noise <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randn<span class="token punctuation">(</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2000</span><span class="token punctuation">)</span><span class="token operator">*</span><span class="token number">0.1</span>
-y_data <span class="token operator">=</span> np<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>w_real <span class="token punctuation">,</span> x_data<span class="token punctuation">.</span>T<span class="token punctuation">)</span> <span class="token operator">+</span> b_real <span class="token operator">+</span> noise
-<span class="token comment" spellcheck="true">#生成数据</span>
-NUM_STEPS <span class="token operator">=</span> <span class="token number">11</span>
-wb <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token punctuation">]</span>
-g <span class="token operator">=</span> tf<span class="token punctuation">.</span>Graph<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">with</span> g<span class="token punctuation">.</span>as_default<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    x <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    y_true <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span>shape<span class="token operator">=</span>None<span class="token punctuation">)</span>
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'inference'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
-        w <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">,</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> dtype <span class="token operator">=</span> tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> name <span class="token operator">=</span> <span class="token string">'weights'</span><span class="token punctuation">)</span>
-        b <span class="token operator">=</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span><span class="token number">0</span> <span class="token punctuation">,</span> dtype <span class="token operator">=</span> tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> name <span class="token operator">=</span> <span class="token string">'bias'</span><span class="token punctuation">)</span>
-        y_pred <span class="token operator">=</span> tf<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>w <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>transpose<span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">)</span> <span class="token operator">+</span> b
-
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'loss'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
-        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>square<span class="token punctuation">(</span>y_true <span class="token operator">-</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>name_scope<span class="token punctuation">(</span><span class="token string">'train'</span><span class="token punctuation">)</span> <span class="token keyword">as</span> scope<span class="token punctuation">:</span>
-        learning_rate <span class="token operator">=</span> <span class="token number">0.5</span>
-        optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>GradientDescentOptimizer<span class="token punctuation">(</span>learning_rate<span class="token punctuation">)</span>
-        train <span class="token operator">=</span> optimizer<span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>loss<span class="token punctuation">)</span>
-
-    init <span class="token operator">=</span> tf<span class="token punctuation">.</span>global_variables_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span>
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sess<span class="token punctuation">:</span>
-        sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>init<span class="token punctuation">)</span>
-        <span class="token keyword">for</span> step <span class="token keyword">in</span> range<span class="token punctuation">(</span>NUM_STEPS<span class="token punctuation">)</span><span class="token punctuation">:</span>
-            sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>train<span class="token punctuation">,</span>feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x <span class="token punctuation">:</span>x_data <span class="token punctuation">,</span> y_true <span class="token punctuation">:</span> y_data<span class="token punctuation">}</span><span class="token punctuation">)</span>
-            <span class="token keyword">if</span> step <span class="token operator">%</span> <span class="token number">5</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
-                <span class="token keyword">print</span><span class="token punctuation">(</span>step <span class="token punctuation">,</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-                wb<span class="token punctuation">.</span>append<span class="token punctuation">(</span>sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span><span class="token punctuation">[</span>w<span class="token punctuation">,</span>b<span class="token punctuation">]</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="逻辑回归"><a href="#逻辑回归" class="headerlink" title="逻辑回归"></a>逻辑回归</h3><p>一般用来进行二分类任务，输出一个0-1之间地离散二值结果，通过sigmoid函数来将数值映射到0到1之间，之后通过阈值分类器来将0到1之间的值转换为0或1，与之前代码的唯一不同是损失函数部分</p>
-<pre class="line-numbers language-pyhton"><code class="language-pyhton">with tf.name_scope('loss') as scope:
-loss = tf.nn.sigmoid_cross_entropy_with_logits(labels = y_true , logits = y_pred)
-loss = tf.reduce_mean(loss)<span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span></span></code></pre>
-<h2 id="CNN"><a href="#CNN" class="headerlink" title="CNN"></a>CNN</h2><p>层中的神经元只与前一层中的一小块区域连接，而不是采取全连接方式，主要由输入层，卷积层，ReLU层，池化层和全连接层构成(一般将卷积层和ReLU层一起称为卷积层)具体说来，卷积层和全连接层（CONV/FC）对输入执行变换操作的时候，不仅会用到激活函数，还会用到很多参数，即神经元的权值w和偏差b；而ReLU层和池化层则是进行一个固定不变的函数操作。卷积层和全连接层中的参数会随着梯度下降被训练，这样卷积神经网络计算出的分类评分就能和训练集中的每个图像的标签吻合了。</p>
-<h3 id="卷积层"><a href="#卷积层" class="headerlink" title="卷积层"></a>卷积层</h3><p>参数由一些可学习的滤波器集合构成，只观察输入数据中的一小部分，由于卷积有“权值共享”这样的特性，可以降低参数的数量，防止参数过多造成过拟合。每个神经元连接的空间大小叫做神经元的感受野，深度与输入相同，但宽高是局部的。输出数据体和使用的滤波器的数量一致，将沿着深度方向排列。有时候在输入数据体的边缘使用0进行填充，使得滤波器可以平滑地在数据上滑动，一般是用来保持数据体的空间尺寸使输入输出宽高相同。如果在一个深度切片中的所有权重都使用同一个权重向量，那么卷积层的前向传播在每个深度切片中可以看做是在计算神经元权重和输入数据体的卷积（这就是“卷积层”名字由来）。这也是为什么总是将这些权重集合称为滤波器（filter）（或卷积核（kernel）），因为它们和输入进行了卷积。简单来说，就是一个在原始数据上以步长为长度不断移动的一个矩阵，层数与原始数据一致，将每个对应位置的数据进行乘积并且将每层的值相加，即为输出的一个数据，例如RGB通道下就是三层滤波器所得相加填入新的矩阵当中。</p>
-<h3 id="池化层"><a href="#池化层" class="headerlink" title="池化层"></a>池化层</h3><p>用来简化数据，减少计算量，有最大池化和平均池化，使用较多的是最大池化，通过找出某一个区域内的最大值/平均值来缩小数据，一般使用的参数是f=2，p=2 恰好为缩小数据为原来的一半，并且反向传播没有参数适用于池化，这一过程是静态过程，参数都是手动设定，或是交叉验证得到的，只用于简化数据，提取特征。</p>
-<h3 id="全连接层"><a href="#全连接层" class="headerlink" title="全连接层"></a>全连接层</h3><p>将池化层简化后的数据进行提取，将特征整合到一起，输出为一个值，主要作用是减小特征位置对于结果产生的影响，将结果进行分类，一般不止一层，需要将提取出来的特征神经元激活后，通过不同神经元激活的组合，再提取出结果</p>
-<p>简单的卷积实现mnist识别,将测试过程分为每个大小为1000幅图的十块</p>
-<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> tensorflow<span class="token punctuation">.</span>compat<span class="token punctuation">.</span>v1 <span class="token keyword">as</span> tf
-<span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
-<span class="token keyword">from</span> tensorflow<span class="token punctuation">.</span>examples<span class="token punctuation">.</span>tutorials<span class="token punctuation">.</span>mnist <span class="token keyword">import</span> input_data
-DATA_DIR <span class="token operator">=</span> <span class="token string">'/tmp/data'</span>
-NUM_STEPS <span class="token operator">=</span> <span class="token number">10000</span>
-MINIBATCH_SIZE <span class="token operator">=</span> <span class="token number">100</span>
-tf<span class="token punctuation">.</span>disable_eager_execution<span class="token punctuation">(</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">weight_variable</span><span class="token punctuation">(</span>shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    initial <span class="token operator">=</span> tf<span class="token punctuation">.</span>truncated_normal<span class="token punctuation">(</span>shape <span class="token punctuation">,</span> stddev<span class="token operator">=</span><span class="token number">0.1</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span>initial<span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">bias_variable</span><span class="token punctuation">(</span>shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    initial <span class="token operator">=</span> tf<span class="token punctuation">.</span>constant<span class="token punctuation">(</span><span class="token number">0.1</span> <span class="token punctuation">,</span> shape <span class="token operator">=</span> shape<span class="token punctuation">)</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>Variable<span class="token punctuation">(</span>initial<span class="token punctuation">)</span>
-<span class="token keyword">def</span> conv2d <span class="token punctuation">(</span>x <span class="token punctuation">,</span> w<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>conv2d<span class="token punctuation">(</span>x <span class="token punctuation">,</span> w <span class="token punctuation">,</span> strides <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span> <span class="token number">1</span> <span class="token punctuation">,</span><span class="token number">1</span> <span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> padding <span class="token operator">=</span> <span class="token string">'SAME'</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">max_pool_2x2</span><span class="token punctuation">(</span>x<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>max_pool<span class="token punctuation">(</span>x <span class="token punctuation">,</span> ksize <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span> <span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">,</span> strides <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> padding<span class="token operator">=</span><span class="token string">'SAME'</span><span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">conv_layer</span><span class="token punctuation">(</span>input <span class="token punctuation">,</span> shape<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    w <span class="token operator">=</span> weight_variable<span class="token punctuation">(</span>shape<span class="token punctuation">)</span>
-    b <span class="token operator">=</span> bias_variable<span class="token punctuation">(</span><span class="token punctuation">[</span>shape<span class="token punctuation">[</span><span class="token number">3</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>conv2d<span class="token punctuation">(</span>input<span class="token punctuation">,</span>w<span class="token punctuation">)</span><span class="token operator">+</span>b<span class="token punctuation">)</span>
-<span class="token keyword">def</span> <span class="token function">full_layer</span><span class="token punctuation">(</span>input <span class="token punctuation">,</span> size<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    in_size <span class="token operator">=</span> int<span class="token punctuation">(</span>input<span class="token punctuation">.</span>get_shape<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    w <span class="token operator">=</span> weight_variable<span class="token punctuation">(</span><span class="token punctuation">[</span>in_size<span class="token punctuation">,</span>size<span class="token punctuation">]</span><span class="token punctuation">)</span>
-    b <span class="token operator">=</span> bias_variable<span class="token punctuation">(</span><span class="token punctuation">[</span>size<span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">return</span> tf<span class="token punctuation">.</span>matmul<span class="token punctuation">(</span>input<span class="token punctuation">,</span>w<span class="token punctuation">)</span> <span class="token operator">+</span> b
-x <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">784</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-y_ <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32 <span class="token punctuation">,</span> shape<span class="token operator">=</span><span class="token punctuation">[</span>None <span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-x_image <span class="token operator">=</span> tf<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span>x<span class="token punctuation">,</span><span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">28</span><span class="token punctuation">,</span><span class="token number">28</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-conv1 <span class="token operator">=</span> conv_layer<span class="token punctuation">(</span>x_image <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">32</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-conv1_pool <span class="token operator">=</span> max_pool_2x2<span class="token punctuation">(</span>conv1<span class="token punctuation">)</span>
-
-conv2 <span class="token operator">=</span> conv_layer<span class="token punctuation">(</span>conv1_pool <span class="token punctuation">,</span> shape <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">5</span><span class="token punctuation">,</span><span class="token number">32</span><span class="token punctuation">,</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-conv2_pool <span class="token operator">=</span> max_pool_2x2<span class="token punctuation">(</span>conv2<span class="token punctuation">)</span>
-
-conv2_flat <span class="token operator">=</span> tf<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span>conv2_pool<span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">,</span><span class="token number">7</span><span class="token operator">*</span><span class="token number">7</span><span class="token operator">*</span><span class="token number">64</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-full_1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">(</span>full_layer<span class="token punctuation">(</span>conv2_flat <span class="token punctuation">,</span> <span class="token number">1024</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-keep_prob <span class="token operator">=</span> tf<span class="token punctuation">.</span>placeholder<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>float32<span class="token punctuation">)</span>
-full1_drop <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>dropout<span class="token punctuation">(</span>full_1 <span class="token punctuation">,</span> keep_prob <span class="token operator">=</span> keep_prob<span class="token punctuation">)</span>
-
-y_conv <span class="token operator">=</span> full_layer<span class="token punctuation">(</span>full1_drop <span class="token punctuation">,</span> <span class="token number">10</span><span class="token punctuation">)</span>
-
-minst <span class="token operator">=</span> input_data<span class="token punctuation">.</span>read_data_sets<span class="token punctuation">(</span>DATA_DIR <span class="token punctuation">,</span> one_hot<span class="token operator">=</span><span class="token boolean">True</span><span class="token punctuation">)</span>
-cross_entropy <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>softmax_cross_entropy_with_logits<span class="token punctuation">(</span>logits <span class="token operator">=</span> y_conv <span class="token punctuation">,</span> labels <span class="token operator">=</span> y_<span class="token punctuation">)</span> <span class="token punctuation">)</span>
-train_step <span class="token operator">=</span> tf<span class="token punctuation">.</span>train<span class="token punctuation">.</span>AdamOptimizer<span class="token punctuation">(</span><span class="token number">1e</span><span class="token operator">-</span><span class="token number">4</span><span class="token punctuation">)</span><span class="token punctuation">.</span>minimize<span class="token punctuation">(</span>cross_entropy<span class="token punctuation">)</span>
-correct_prediction <span class="token operator">=</span> tf<span class="token punctuation">.</span>equal<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>argmax<span class="token punctuation">(</span>y_conv <span class="token punctuation">,</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>arg_max<span class="token punctuation">(</span>y_<span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-accuracy <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>cast<span class="token punctuation">(</span>correct_prediction <span class="token punctuation">,</span> tf<span class="token punctuation">.</span>float32<span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token keyword">with</span> tf<span class="token punctuation">.</span>Session<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> sess<span class="token punctuation">:</span>
-    sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>global_variables_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-
-    <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span>NUM_STEPS<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        batch <span class="token operator">=</span> minst<span class="token punctuation">.</span>train<span class="token punctuation">.</span>next_batch<span class="token punctuation">(</span><span class="token number">50</span><span class="token punctuation">)</span>
-
-        <span class="token keyword">if</span> i <span class="token operator">%</span> <span class="token number">100</span> <span class="token operator">==</span> <span class="token number">0</span><span class="token punctuation">:</span>
-            train_accuracy <span class="token operator">=</span> sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>accuracy <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">1.0</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
-            <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"step {} , train accuracy {}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>i<span class="token punctuation">,</span>train_accuracy<span class="token punctuation">)</span><span class="token punctuation">)</span>
-        sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>train_step <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>batch<span class="token punctuation">[</span><span class="token number">1</span><span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">0.5</span><span class="token punctuation">}</span><span class="token punctuation">)</span>
-        X <span class="token operator">=</span> minst<span class="token punctuation">.</span>test<span class="token punctuation">.</span>images<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">1000</span><span class="token punctuation">,</span><span class="token number">784</span><span class="token punctuation">)</span>
-        Y <span class="token operator">=</span> minst<span class="token punctuation">.</span>test<span class="token punctuation">.</span>labels<span class="token punctuation">.</span>reshape<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">,</span><span class="token number">1000</span><span class="token punctuation">,</span><span class="token number">10</span><span class="token punctuation">)</span>
-        test_accuracy <span class="token operator">=</span> np<span class="token punctuation">.</span>mean<span class="token punctuation">(</span><span class="token punctuation">[</span>sess<span class="token punctuation">.</span>run<span class="token punctuation">(</span>accuracy <span class="token punctuation">,</span> feed_dict<span class="token operator">=</span><span class="token punctuation">{</span>x<span class="token punctuation">:</span>X<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token punctuation">,</span> y_<span class="token punctuation">:</span>Y<span class="token punctuation">[</span>i<span class="token punctuation">]</span> <span class="token punctuation">,</span> keep_prob <span class="token punctuation">:</span> <span class="token number">1.0</span><span class="token punctuation">}</span><span class="token punctuation">)</span> <span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">10</span><span class="token punctuation">)</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-    <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"test accuracy: {}"</span><span class="token punctuation">.</span>format<span class="token punctuation">(</span>test_accuracy<span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<h3 id="ResNet"><a href="#ResNet" class="headerlink" title="ResNet"></a>ResNet</h3><p>深度残差网络（Deep residual network, ResNet）的提出是CNN图像史上的一件里程碑事件.通过引入残差学习的方法来解决网络在随着深度增加时出现的准确度饱和下降，梯度爆炸以及消失的难以训练的问题。对于一个堆积结构，在输入x时，学到的特征为H(x)，现在希望其学到残差即 H(x)-x,这样即使残差为0时，也仅是在层之间做了恒等映射，至少不会性能下降，残差使得其会在本有的特征上学习到新的特征，有点类似电路中的短路`</p>
-
-      </div>
-  </article>
-
-  <article class="post">
-      
-        
-          <h1><a href="/2020/08/26/Tensorflow2.x学习笔记/">TensorFlow2.x学习笔记</a></h1>
-        
-      
-      <div class="post-content ">
-        
-  
-
-
-
-
-        <h2 id="基础"><a href="#基础" class="headerlink" title="基础"></a>基础</h2><p>创建变量等操作与1.x基本类似，但可以进行即时执行模式，与之前的图执行模式不同，语法更精炼简单。</p>
-<pre class="line-numbers language-python"><code class="language-python">num_epoch <span class="token operator">=</span> <span class="token number">100000</span>
-optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>optimizers<span class="token punctuation">.</span>SGD<span class="token punctuation">(</span>learning_rate <span class="token operator">=</span> <span class="token number">5e</span><span class="token operator">-</span><span class="token number">4</span><span class="token punctuation">)</span>
-<span class="token keyword">for</span> e <span class="token keyword">in</span> range<span class="token punctuation">(</span>num_epoch<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>GradientTape<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> tape<span class="token punctuation">:</span>
-        y_pred <span class="token operator">=</span> a <span class="token operator">*</span> x <span class="token operator">+</span> b
-        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_sum<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>square<span class="token punctuation">(</span>y <span class="token operator">-</span> y_pred<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    grads <span class="token operator">=</span> tape<span class="token punctuation">.</span>gradient<span class="token punctuation">(</span>loss <span class="token punctuation">,</span> variables<span class="token punctuation">)</span>
-    optimizer<span class="token punctuation">.</span>apply_gradients<span class="token punctuation">(</span>grads_and_vars <span class="token operator">=</span> zip<span class="token punctuation">(</span>grads <span class="token punctuation">,</span> variables<span class="token punctuation">)</span><span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>可以直接调用GradientTape来进行梯度以及导数计算。上面的代码中声明了一个梯度下降优化器，可以通过计算的求导结果更新模型参数，从而最小化某个特定的损失函数，通过apply_gradients()方法来进行调用，函数内的参数为需要更新的变量以及损失函数关于该变量的偏导数。需要传入一个列表，每个元素为(偏导，变量)。</p>
-<h2 id="模型与层"><a href="#模型与层" class="headerlink" title="模型与层"></a>模型与层</h2><p>使用TF内置的库Keras来进行模型的构建。<br>Keras里有两个重要的概念：<strong>层(Layer)</strong>和<strong>模型(model)</strong>,层将各种计算流程和变量进行了封装(全连接层，卷积层，池化层等)，模型则用于各种层进行连接。模型通过类的形式呈现，所以可以通过继承tf.keras.Model来定义自己的模型，需要重写<strong>init</strong>()和call(),继承模型后可以调用模型中的方法和属性。可以大量简化代码,下面是通过模型的方式编写的一个简单的线性回归，可以看出在进行计算处理部分与之前基本一致，但是关于模型变量的访问，以及模型初始化都方便了许多。通过在模型内部实例化了一个全连接层，并对其在call()中进行调用</p>
-<pre class="line-numbers language-python"><code class="language-python">X <span class="token operator">=</span> tf<span class="token punctuation">.</span>constant<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">1.0</span><span class="token punctuation">,</span> <span class="token number">2.0</span><span class="token punctuation">,</span> <span class="token number">3.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">4.0</span><span class="token punctuation">,</span> <span class="token number">5.0</span><span class="token punctuation">,</span> <span class="token number">6.0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-y <span class="token operator">=</span> tf<span class="token punctuation">.</span>constant<span class="token punctuation">(</span><span class="token punctuation">[</span><span class="token punctuation">[</span><span class="token number">10.0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> <span class="token punctuation">[</span><span class="token number">20.0</span><span class="token punctuation">]</span><span class="token punctuation">]</span><span class="token punctuation">)</span>
-
-<span class="token keyword">class</span> <span class="token class-name">Linear</span><span class="token punctuation">(</span>tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>Model<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        super<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>dense <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span>
-            units <span class="token operator">=</span> <span class="token number">1</span><span class="token punctuation">,</span>
-            activation<span class="token operator">=</span>None<span class="token punctuation">,</span>
-            kernel_initializer <span class="token operator">=</span> tf<span class="token punctuation">.</span>zeros_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">,</span>
-            bias_initializer <span class="token operator">=</span> tf<span class="token punctuation">.</span>zeros_initializer<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token punctuation">)</span>
-    <span class="token keyword">def</span> <span class="token function">call</span><span class="token punctuation">(</span>self <span class="token punctuation">,</span> input<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        output <span class="token operator">=</span> self<span class="token punctuation">.</span>dense<span class="token punctuation">(</span>input<span class="token punctuation">)</span>
-        <span class="token keyword">return</span> output
-model <span class="token operator">=</span> Linear<span class="token punctuation">(</span><span class="token punctuation">)</span>
-optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>optimizers<span class="token punctuation">.</span>SGD<span class="token punctuation">(</span>lr<span class="token operator">=</span><span class="token number">0.01</span><span class="token punctuation">)</span>
-<span class="token keyword">for</span> i <span class="token keyword">in</span> range<span class="token punctuation">(</span><span class="token number">100</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>GradientTape<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> tape<span class="token punctuation">:</span>
-        y_pred <span class="token operator">=</span> model<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
-        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>tf<span class="token punctuation">.</span>square<span class="token punctuation">(</span>y_pred <span class="token operator">-</span> y<span class="token punctuation">)</span><span class="token punctuation">)</span>
-    grads <span class="token operator">=</span> tape<span class="token punctuation">.</span>gradient<span class="token punctuation">(</span>loss <span class="token punctuation">,</span> model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span>
-    optimizer<span class="token punctuation">.</span>apply_gradients<span class="token punctuation">(</span>grads_and_vars <span class="token operator">=</span> zip<span class="token punctuation">(</span>grads <span class="token punctuation">,</span> model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span>model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p><strong>全连接层(Dense)</strong> 是最常用的层之一，对输入矩阵进行f(AW+b)的线性变换+激活函数操作，激活函数一般是Relu等等.包含的参数如下</p>
-<ul>
-<li>units 输出张量的维度</li>
-<li>activation 激活函数 不指定时为f(x) = x</li>
-<li>use_bias 添加偏置，默认为True</li>
-<li>kernel_initializer,bias_initializer 权重，偏置的初始化器，默认为glort_uniform_initializer(很多层都默认使用)，使用ezeros_initializer表示初始化为0</li>
-</ul>
-<p><strong>softmax函数</strong>为了使得模型的输出能始终满足这两个条件，我们使用 Softmax 函数 （归一化指数函数， tf.nn.softmax ）对模型的原始输出进行归一化 。不仅如此，softmax 函数能够凸显原始向量中最大的值，并抑制远低于最大值的其他分量，这也是该函数被称作 softmax 函数的原因（即平滑化的 argmax 函数）。</p>
-<h3 id="模型的训练"><a href="#模型的训练" class="headerlink" title="模型的训练"></a>模型的训练</h3><p>tf.keras.losses 和 tf.keras.optimizer<br>需要定义一些模型超参数</p>
-<ul>
-<li><p>num_epochs = 5</p>
-</li>
-<li><p>batch_size = 50</p>
-</li>
-<li><p>learning_rate = 0.001<br>之后实例化模型和优化器，迭代进行数据的读取以及模型的训练步骤如下</p>
-</li>
-<li><p>从 DataLoader 中随机取一批训练数据；</p>
-</li>
-<li><p>将这批数据送入模型，计算出模型的预测值；</p>
-</li>
-<li><p>将模型预测值与真实值进行比较，计算损失函数（loss）。这里使用 tf.keras.losses 中的交叉熵函数作为损失函数</p>
-</li>
-<li><p>计算损失函数关于模型变量的导数；</p>
-</li>
-<li><p>将求出的导数值传入优化器，使用优化器的 apply_gradients 方法更新模型参数以最小化损失函数</p>
-</li>
-</ul>
-<h3 id="模型的评估"><a href="#模型的评估" class="headerlink" title="模型的评估"></a>模型的评估</h3><p>使用tf.keras.metrics中的SparseCategoricalAccuracy来评估模型在测试集上的性能，通过将预测结果与真是结果相比较，输出正确的占比。通过update_state()方法向评估器输入预测值和真实值。其内部有变量来保存当前评估的指标的数值，最终通过result()方法输出最终评估值。</p>
-<h3 id="代码汇总"><a href="#代码汇总" class="headerlink" title="代码汇总"></a>代码汇总</h3><pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">import</span> numpy <span class="token keyword">as</span> np
-<span class="token keyword">import</span> tensorflow <span class="token keyword">as</span> tf
-<span class="token comment" spellcheck="true">#CNN with keras</span>
-<span class="token keyword">class</span> <span class="token class-name">CNN</span><span class="token punctuation">(</span>tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>Model<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        super<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">.</span>__init__<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>conv1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Conv2D<span class="token punctuation">(</span>
-            filters<span class="token operator">=</span><span class="token number">32</span><span class="token punctuation">,</span>             <span class="token comment" spellcheck="true"># 卷积层神经元（卷积核）数目</span>
-            kernel_size<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span>     <span class="token comment" spellcheck="true"># 感受野大小</span>
-            padding<span class="token operator">=</span><span class="token string">'same'</span><span class="token punctuation">,</span>         <span class="token comment" spellcheck="true"># padding策略（vaild 或 same）</span>
-            activation<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu   <span class="token comment" spellcheck="true"># 激活函数</span>
-        <span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>pool1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>MaxPool2D<span class="token punctuation">(</span>pool_size<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> strides<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>conv2 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Conv2D<span class="token punctuation">(</span>
-            filters<span class="token operator">=</span><span class="token number">64</span><span class="token punctuation">,</span>
-            kernel_size<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">5</span><span class="token punctuation">,</span> <span class="token number">5</span><span class="token punctuation">]</span><span class="token punctuation">,</span>
-            padding<span class="token operator">=</span><span class="token string">'same'</span><span class="token punctuation">,</span>
-            activation<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu
-        <span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>pool2 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>MaxPool2D<span class="token punctuation">(</span>pool_size<span class="token operator">=</span><span class="token punctuation">[</span><span class="token number">2</span><span class="token punctuation">,</span> <span class="token number">2</span><span class="token punctuation">]</span><span class="token punctuation">,</span> strides<span class="token operator">=</span><span class="token number">2</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>flatten <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Reshape<span class="token punctuation">(</span>target_shape<span class="token operator">=</span><span class="token punctuation">(</span><span class="token number">7</span> <span class="token operator">*</span> <span class="token number">7</span> <span class="token operator">*</span> <span class="token number">64</span><span class="token punctuation">,</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>dense1 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">1024</span><span class="token punctuation">,</span> activation<span class="token operator">=</span>tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>relu<span class="token punctuation">)</span>
-        self<span class="token punctuation">.</span>dense2 <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>layers<span class="token punctuation">.</span>Dense<span class="token punctuation">(</span>units<span class="token operator">=</span><span class="token number">10</span><span class="token punctuation">)</span>
-
-    <span class="token keyword">def</span> <span class="token function">call</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> inputs<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        x <span class="token operator">=</span> self<span class="token punctuation">.</span>conv1<span class="token punctuation">(</span>inputs<span class="token punctuation">)</span>                  <span class="token comment" spellcheck="true"># [batch_size, 28, 28, 32]</span>
-        x <span class="token operator">=</span> self<span class="token punctuation">.</span>pool1<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                       <span class="token comment" spellcheck="true"># [batch_size, 14, 14, 32]</span>
-        x <span class="token operator">=</span> self<span class="token punctuation">.</span>conv2<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                       <span class="token comment" spellcheck="true"># [batch_size, 14, 14, 64]</span>
-        x <span class="token operator">=</span> self<span class="token punctuation">.</span>pool2<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                       <span class="token comment" spellcheck="true"># [batch_size, 7, 7, 64]</span>
-        x <span class="token operator">=</span> self<span class="token punctuation">.</span>flatten<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                     <span class="token comment" spellcheck="true"># [batch_size, 7 * 7 * 64]</span>
-        x <span class="token operator">=</span> self<span class="token punctuation">.</span>dense1<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                      <span class="token comment" spellcheck="true"># [batch_size, 1024]</span>
-        x <span class="token operator">=</span> self<span class="token punctuation">.</span>dense2<span class="token punctuation">(</span>x<span class="token punctuation">)</span>                      <span class="token comment" spellcheck="true"># [batch_size, 10]</span>
-        output <span class="token operator">=</span> tf<span class="token punctuation">.</span>nn<span class="token punctuation">.</span>softmax<span class="token punctuation">(</span>x<span class="token punctuation">)</span>
-        <span class="token keyword">return</span> output
-<span class="token comment" spellcheck="true"># MNISTLoader and MLP</span>
-<span class="token keyword">class</span> <span class="token class-name">MNISTLoader</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">:</span>
-    <span class="token keyword">def</span> <span class="token function">__init__</span><span class="token punctuation">(</span>self<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        mnist <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>datasets<span class="token punctuation">.</span>mnist
-        <span class="token punctuation">(</span>self<span class="token punctuation">.</span>train_data<span class="token punctuation">,</span> self<span class="token punctuation">.</span>train_label<span class="token punctuation">)</span><span class="token punctuation">,</span> <span class="token punctuation">(</span>self<span class="token punctuation">.</span>test_data<span class="token punctuation">,</span> self<span class="token punctuation">.</span>test_label<span class="token punctuation">)</span> <span class="token operator">=</span> mnist<span class="token punctuation">.</span>load_data<span class="token punctuation">(</span><span class="token punctuation">)</span>
-        <span class="token comment" spellcheck="true"># MNIST中的图像默认为uint8（0-255的数字）。以下代码将其归一化到0-1之间的浮点数，并在最后增加一维作为颜色通道</span>
-        self<span class="token punctuation">.</span>train_data <span class="token operator">=</span> np<span class="token punctuation">.</span>expand_dims<span class="token punctuation">(</span>self<span class="token punctuation">.</span>train_data<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">255.0</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># [60000, 28, 28, 1]</span>
-        self<span class="token punctuation">.</span>test_data <span class="token operator">=</span> np<span class="token punctuation">.</span>expand_dims<span class="token punctuation">(</span>self<span class="token punctuation">.</span>test_data<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>float32<span class="token punctuation">)</span> <span class="token operator">/</span> <span class="token number">255.0</span><span class="token punctuation">,</span> axis<span class="token operator">=</span><span class="token operator">-</span><span class="token number">1</span><span class="token punctuation">)</span>        <span class="token comment" spellcheck="true"># [10000, 28, 28, 1]</span>
-        self<span class="token punctuation">.</span>train_label <span class="token operator">=</span> self<span class="token punctuation">.</span>train_label<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>int32<span class="token punctuation">)</span>    <span class="token comment" spellcheck="true"># [60000]</span>
-        self<span class="token punctuation">.</span>test_label <span class="token operator">=</span> self<span class="token punctuation">.</span>test_label<span class="token punctuation">.</span>astype<span class="token punctuation">(</span>np<span class="token punctuation">.</span>int32<span class="token punctuation">)</span>      <span class="token comment" spellcheck="true"># [10000]</span>
-        self<span class="token punctuation">.</span>num_train_data<span class="token punctuation">,</span> self<span class="token punctuation">.</span>num_test_data <span class="token operator">=</span> self<span class="token punctuation">.</span>train_data<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span>test_data<span class="token punctuation">.</span>shape<span class="token punctuation">[</span><span class="token number">0</span><span class="token punctuation">]</span>
-
-    <span class="token keyword">def</span> <span class="token function">get_batch</span><span class="token punctuation">(</span>self<span class="token punctuation">,</span> batch_size<span class="token punctuation">)</span><span class="token punctuation">:</span>
-        <span class="token comment" spellcheck="true"># 从数据集中随机取出batch_size个元素并返回</span>
-        index <span class="token operator">=</span> np<span class="token punctuation">.</span>random<span class="token punctuation">.</span>randint<span class="token punctuation">(</span><span class="token number">0</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span>num_train_data<span class="token punctuation">,</span> batch_size<span class="token punctuation">)</span>
-        <span class="token keyword">return</span> self<span class="token punctuation">.</span>train_data<span class="token punctuation">[</span>index<span class="token punctuation">,</span> <span class="token punctuation">:</span><span class="token punctuation">]</span><span class="token punctuation">,</span> self<span class="token punctuation">.</span>train_label<span class="token punctuation">[</span>index<span class="token punctuation">]</span>
-
-
-
-
-<span class="token comment" spellcheck="true"># class MLP(tf.keras.Model):</span>
-<span class="token comment" spellcheck="true">#     def __init__(self, *args, **kwargs):</span>
-<span class="token comment" spellcheck="true">#         super().__init__(*args, **kwargs)</span>
-<span class="token comment" spellcheck="true">#         self._flatten = tf.keras.layers.Flatten()</span>
-<span class="token comment" spellcheck="true">#         self.dense1 = tf.keras.layers.Dense(units=100 , activation = tf.nn.relu)</span>
-<span class="token comment" spellcheck="true">#         self.dense2 = tf.keras.layers.Dense(units=10)</span>
-<span class="token comment" spellcheck="true">#     def call(self, inputs):</span>
-<span class="token comment" spellcheck="true">#         x = self._flatten(inputs)</span>
-<span class="token comment" spellcheck="true">#         x = self.dense1(x)</span>
-<span class="token comment" spellcheck="true">#         x = self.dense2(x)</span>
-<span class="token comment" spellcheck="true">#         output = tf.nn.softmax(x)</span>
-<span class="token comment" spellcheck="true">#         return output</span>
-num_epochs <span class="token operator">=</span> <span class="token number">5</span>
-batch_size <span class="token operator">=</span> <span class="token number">50</span>
-learning_rate <span class="token operator">=</span> <span class="token number">0.001</span>
-model <span class="token operator">=</span> CNN<span class="token punctuation">(</span><span class="token punctuation">)</span>
-data_loader <span class="token operator">=</span> MNISTLoader<span class="token punctuation">(</span><span class="token punctuation">)</span>
-optimizer <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>optimizers<span class="token punctuation">.</span>Adam<span class="token punctuation">(</span>learning_rate <span class="token operator">=</span> learning_rate<span class="token punctuation">)</span>
-num_batches <span class="token operator">=</span> int<span class="token punctuation">(</span>data_loader<span class="token punctuation">.</span>num_train_data <span class="token operator">//</span> batch_size <span class="token operator">*</span> num_epochs<span class="token punctuation">)</span>
-<span class="token keyword">for</span> batch_index <span class="token keyword">in</span> range<span class="token punctuation">(</span>num_batches<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    X <span class="token punctuation">,</span> y <span class="token operator">=</span> data_loader<span class="token punctuation">.</span>get_batch<span class="token punctuation">(</span>batch_size<span class="token punctuation">)</span>
-    <span class="token keyword">with</span> tf<span class="token punctuation">.</span>GradientTape<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token keyword">as</span> tape<span class="token punctuation">:</span>
-        y_pred <span class="token operator">=</span> model<span class="token punctuation">(</span>X<span class="token punctuation">)</span>
-        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>losses<span class="token punctuation">.</span>sparse_categorical_crossentropy<span class="token punctuation">(</span>y_true<span class="token operator">=</span>y <span class="token punctuation">,</span> y_pred<span class="token operator">=</span>y_pred<span class="token punctuation">)</span>
-        loss <span class="token operator">=</span> tf<span class="token punctuation">.</span>reduce_mean<span class="token punctuation">(</span>loss<span class="token punctuation">)</span>
-        <span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"batch %d: loss %f"</span><span class="token operator">%</span><span class="token punctuation">(</span>batch_index <span class="token punctuation">,</span> loss<span class="token punctuation">.</span>numpy<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-    grads <span class="token operator">=</span> tape<span class="token punctuation">.</span>gradient<span class="token punctuation">(</span>loss <span class="token punctuation">,</span> model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span>
-    optimizer<span class="token punctuation">.</span>apply_gradients<span class="token punctuation">(</span>grads_and_vars <span class="token operator">=</span> zip<span class="token punctuation">(</span>grads <span class="token punctuation">,</span> model<span class="token punctuation">.</span>variables<span class="token punctuation">)</span><span class="token punctuation">)</span>
-sparse_categorical_accuracy <span class="token operator">=</span> tf<span class="token punctuation">.</span>keras<span class="token punctuation">.</span>metrics<span class="token punctuation">.</span>SparseCategoricalAccuracy<span class="token punctuation">(</span><span class="token punctuation">)</span>
-num_batches <span class="token operator">=</span> int<span class="token punctuation">(</span>data_loader<span class="token punctuation">.</span>num_test_data <span class="token operator">//</span> batch_size<span class="token punctuation">)</span>
-<span class="token keyword">for</span> batch_index <span class="token keyword">in</span> range<span class="token punctuation">(</span>num_batches<span class="token punctuation">)</span><span class="token punctuation">:</span>
-    start_index <span class="token punctuation">,</span> end_index <span class="token operator">=</span> batch_index <span class="token operator">*</span> batch_size <span class="token punctuation">,</span> <span class="token punctuation">(</span>batch_index <span class="token operator">+</span> <span class="token number">1</span><span class="token punctuation">)</span> <span class="token operator">*</span> batch_size
-    y_pred <span class="token operator">=</span> model<span class="token punctuation">.</span>predict<span class="token punctuation">(</span>data_loader<span class="token punctuation">.</span>test_data<span class="token punctuation">[</span>start_index <span class="token punctuation">:</span> end_index<span class="token punctuation">]</span><span class="token punctuation">)</span>
-    sparse_categorical_accuracy<span class="token punctuation">.</span>update_state<span class="token punctuation">(</span>y_true <span class="token operator">=</span> data_loader<span class="token punctuation">.</span>test_label<span class="token punctuation">[</span>start_index <span class="token punctuation">:</span> end_index<span class="token punctuation">]</span> <span class="token punctuation">,</span> y_pred<span class="token operator">=</span> y_pred<span class="token punctuation">)</span>
-<span class="token keyword">print</span><span class="token punctuation">(</span><span class="token string">"test accuracy : %f"</span><span class="token operator">%</span>sparse_categorical_accuracy<span class="token punctuation">.</span>result<span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">)</span>
-<span class="token comment" spellcheck="true">#using Model for linear regression</span>
-<span class="token comment" spellcheck="true"># X = tf.constant([[1.0, 2.0, 3.0], [4.0, 5.0, 6.0]])</span>
-<span class="token comment" spellcheck="true"># y = tf.constant([[10.0], [20.0]])</span>
-
-<span class="token comment" spellcheck="true"># class Linear(tf.keras.Model):</span>
-<span class="token comment" spellcheck="true">#     def __init__(self):</span>
-<span class="token comment" spellcheck="true">#         super().__init__()</span>
-<span class="token comment" spellcheck="true">#         self.dense = tf.keras.layers.Dense(</span>
-<span class="token comment" spellcheck="true">#             units = 1,</span>
-<span class="token comment" spellcheck="true">#             activation=None,</span>
-<span class="token comment" spellcheck="true">#             kernel_initializer = tf.zeros_initializer(),</span>
-<span class="token comment" spellcheck="true">#             bias_initializer = tf.zeros_initializer()</span>
-<span class="token comment" spellcheck="true">#         )</span>
-<span class="token comment" spellcheck="true">#     def call(self , input):</span>
-<span class="token comment" spellcheck="true">#         output = self.dense(input)</span>
-<span class="token comment" spellcheck="true">#         return output</span>
-<span class="token comment" spellcheck="true"># model = Linear()</span>
-<span class="token comment" spellcheck="true"># optimizer = tf.keras.optimizers.SGD(lr=0.01)</span>
-<span class="token comment" spellcheck="true"># for i in range(100):</span>
-<span class="token comment" spellcheck="true">#     with tf.GradientTape() as tape:</span>
-<span class="token comment" spellcheck="true">#         y_pred = model(X)</span>
-<span class="token comment" spellcheck="true">#         print(model.variables)</span>
-<span class="token comment" spellcheck="true">#         loss = tf.reduce_mean(tf.square(y_pred - y))</span>
-<span class="token comment" spellcheck="true">#     grads = tape.gradient(loss , model.variables)</span>
-<span class="token comment" spellcheck="true">#     optimizer.apply_gradients(grads_and_vars = zip(grads , model.variables))</span>
-<span class="token comment" spellcheck="true"># print(model.variables)</span>
-<span class="token comment" spellcheck="true"># 1st the linear regression</span>
-<span class="token comment" spellcheck="true"># X_raw = np.array([2013, 2014, 2015, 2016, 2017], dtype=np.float32)</span>
-<span class="token comment" spellcheck="true"># y_raw = np.array([12000, 14000, 15000, 16500, 17500], dtype=np.float32)</span>
-
-<span class="token comment" spellcheck="true"># x = (X_raw - X_raw.min()) / (X_raw.max() - X_raw.min())</span>
-<span class="token comment" spellcheck="true"># y = (y_raw - y_raw.min()) / (y_raw.max() - y_raw.min())</span>
-
-<span class="token comment" spellcheck="true"># x = tf.constant(x)</span>
-<span class="token comment" spellcheck="true"># y = tf.constant(y)</span>
-
-<span class="token comment" spellcheck="true"># a = tf.Variable(initial_value = 0.)</span>
-<span class="token comment" spellcheck="true"># b = tf.Variable(initial_value = 0 , dtype = tf.float32)</span>
-<span class="token comment" spellcheck="true"># variables = [a,b]</span>
-
-<span class="token comment" spellcheck="true"># num_epoch = 100000</span>
-<span class="token comment" spellcheck="true"># optimizer = tf.keras.optimizers.SGD(learning_rate = 5e-4)</span>
-<span class="token comment" spellcheck="true"># for e in range(num_epoch):</span>
-<span class="token comment" spellcheck="true">#     with tf.GradientTape() as tape:</span>
-<span class="token comment" spellcheck="true">#         y_pred = a * x + b</span>
-<span class="token comment" spellcheck="true">#         loss = tf.reduce_sum(tf.square(y - y_pred))</span>
-<span class="token comment" spellcheck="true">#     grads = tape.gradient(loss , variables)</span>
-<span class="token comment" spellcheck="true">#     optimizer.apply_gradients(grads_and_vars = zip(grads , variables))</span>
-<span class="token comment" spellcheck="true"># print(a,b)</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-
-      </div>
-  </article>
-
-  <article class="post">
-      
-        
-          <h1><a href="/2019/12/26/Mybatis/">Mybatis</a></h1>
-        
-      
-      <div class="post-content ">
-        
-  
-
-
-
-
-        <h2 id="框架"><a href="#框架" class="headerlink" title="框架"></a>框架</h2><ol>
-<li>框架的概念:软件开发中的一套解决方案，不同方案可以解决不同的问题，封装了许多的细节，可以使开发效率大幅度提高。</li>
-<li>三层架构：<ul>
-<li>表现层：数据的展示</li>
-<li>业务层：处理业务需求</li>
-<li>持久层：与数据库交互</li>
-</ul>
-</li>
-<li>持久层的技术解决方案<ul>
-<li>JDBC技术<ul>
-<li>Connection</li>
-<li>PreparedStatement</li>
-<li>ResultSet</li>
-</ul>
-</li>
-<li>Spring的JdbcTemplate:Spring对jdbc的简单封装</li>
-<li>Apache的DBUtiles:与SPring的jdbcTemplate很像，也是对与jdbc的简单封装</li>
-</ul>
-</li>
-<li>mybatis是一个持久层的框架，封装了jdbc操作的细节，使用了ORM思想，实现了结果集的封装。<br>ORM(Object Relational Mapping)将数据库表和实体类及实体类的属性对应起来可以操作实体类就实现操作数据库表</li>
-</ol>
-<h2 id="环境搭建"><a href="#环境搭建" class="headerlink" title="环境搭建"></a>环境搭建</h2><ol>
-<li><p>使用IDE创建出一个maven项目</p>
-</li>
-<li><p>选择项目地打包方式，在项目中引入依赖</p>
-<pre class="line-numbers language-java"><code class="language-java"><span class="token operator">&lt;</span>groupId<span class="token operator">></span>com<span class="token punctuation">.</span>itheima<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
- <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>first_mybatis<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
- <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">1.0</span><span class="token operator">-</span>SNAPSHOT<span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
- <span class="token operator">&lt;</span>packaging<span class="token operator">></span>jar<span class="token operator">&lt;</span><span class="token operator">/</span>packaging<span class="token operator">></span>
- <span class="token operator">&lt;</span>dependencies<span class="token operator">></span>
-     <span class="token operator">&lt;</span>dependency<span class="token operator">></span>
-     <span class="token operator">&lt;</span>groupId<span class="token operator">></span>org<span class="token punctuation">.</span>mybatis<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
-     <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>mybatis<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
-     <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">3.4</span><span class="token punctuation">.</span><span class="token number">5</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
- <span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
-     <span class="token operator">&lt;</span>dependency<span class="token operator">></span>
-         <span class="token operator">&lt;</span>groupId<span class="token operator">></span>mysql<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>mysql<span class="token operator">-</span>connector<span class="token operator">-</span>java<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">6.0</span><span class="token punctuation">.</span><span class="token number">5</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
-     <span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
-     <span class="token operator">&lt;</span>dependency<span class="token operator">></span>
-         <span class="token operator">&lt;</span>groupId<span class="token operator">></span>log4j<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>log4j<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">1.2</span><span class="token punctuation">.</span><span class="token number">12</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
-     <span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
-     <span class="token operator">&lt;</span>dependency<span class="token operator">></span>
-         <span class="token operator">&lt;</span>groupId<span class="token operator">></span>junit<span class="token operator">&lt;</span><span class="token operator">/</span>groupId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>artifactId<span class="token operator">></span>junit<span class="token operator">&lt;</span><span class="token operator">/</span>artifactId<span class="token operator">></span>
-         <span class="token operator">&lt;</span>version<span class="token operator">></span><span class="token number">4.12</span><span class="token operator">&lt;</span><span class="token operator">/</span>version<span class="token operator">></span>
-     <span class="token operator">&lt;</span><span class="token operator">/</span>dependency<span class="token operator">></span>
- <span class="token operator">&lt;</span><span class="token operator">/</span>dependencies<span class="token operator">></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-</li>
-<li><p>接下来在src中创建数据库表中对应的对象，且要implements Serializable使对象序列化接下来是一些基本你的操作，将所有属性私有化留出get和set方法</p>
-</li>
-<li><p>接下来创建出一个IuserDao的接口(I的意思只是Interface)称为用户的持久层接口，在其中创建查询所有操作的序列。</p>
-</li>
-<li><p>配置mybtis的环境，创建一个xml文件在resources文件夹下,在创建完成后需要在相应的mapper位置下建立对应的配置，且引入mapper的约束。</p>
-</li>
-</ol>
-<p>Config配置</p>
-<pre class="line-numbers language-xml"><code class="language-xml"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8" ?></span>
-<span class="token doctype">&lt;!DOCTYPE configuration
-        PUBLIC "-//mybatis.org//DTD Config 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-config.dtd"></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>configuration</span><span class="token punctuation">></span></span>
-    <span class="token comment" spellcheck="true">&lt;!--配置环境--></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>environments</span> <span class="token attr-name">default</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>mysql<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-        <span class="token comment" spellcheck="true">&lt;!--配置mysql环境--></span>
-        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>environment</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>mysql<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-            <span class="token comment" spellcheck="true">&lt;!--配置事务类型--></span>
-            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>transactionManager</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>JDBC<span class="token punctuation">"</span></span><span class="token punctuation">></span></span><span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>transactionManager</span><span class="token punctuation">></span></span>
-            <span class="token comment" spellcheck="true">&lt;!--配置连接池--></span>
-            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>dataSource</span> <span class="token attr-name">type</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>POOLED<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-                <span class="token comment" spellcheck="true">&lt;!--配置连接数据库的基本信息--></span>
-                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>driver<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com.mysql,jdbc.Driver<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>url<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>jdbc:mysql://localhost:3306/mybatis<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>username<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>root<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-                <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>property</span> <span class="token attr-name">name</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>password<span class="token punctuation">"</span></span> <span class="token attr-name">value</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>root<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-            <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>dataSource</span><span class="token punctuation">></span></span>
-        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>environment</span><span class="token punctuation">></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>environments</span><span class="token punctuation">></span></span>
-
-    <span class="token comment" spellcheck="true">&lt;!--指定映射配置文件--></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mappers</span><span class="token punctuation">></span></span>
-        <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mapper</span> <span class="token attr-name">resource</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com/itheima.dao/IuserDao.xml<span class="token punctuation">"</span></span><span class="token punctuation">/></span></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mappers</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>configuration</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>mapper的配置</p>
-<pre class="line-numbers language-xml"><code class="language-xml"><span class="token prolog">&lt;?xml version="1.0" encoding="UTF-8" ?></span>
-<span class="token doctype">&lt;!DOCTYPE mapper
-        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
-        "http://mybatis.org/dtd/mybatis-3-mapper.dtd" ></span>
-
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>mapper</span> <span class="token attr-name">namespace</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>com.itheima.dao.IUserDao<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-    <span class="token comment" spellcheck="true">&lt;!--配置查询所有--></span>
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;</span>select</span> <span class="token attr-name">id</span><span class="token attr-value"><span class="token punctuation">=</span><span class="token punctuation">"</span>findAll<span class="token punctuation">"</span></span><span class="token punctuation">></span></span>
-        select * from USER
-    <span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>select</span><span class="token punctuation">></span></span>
-<span class="token tag"><span class="token tag"><span class="token punctuation">&lt;/</span>mapper</span><span class="token punctuation">></span></span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>至此环境搭建基本完成，在进行这些操作前需要将maven项目的环境搭建好，并建立好仓库等。</p>
-<h2 id="mybatis的实例"><a href="#mybatis的实例" class="headerlink" title="mybatis的实例"></a>mybatis的实例</h2><p>1.在test的java文件夹中以main函数来进行测试，且使用了工厂模式来进行sql语句的执行</p>
-<pre class="line-numbers language-java"><code class="language-java"><span class="token keyword">public</span> <span class="token keyword">static</span> <span class="token keyword">void</span> <span class="token function">main</span><span class="token punctuation">(</span>String<span class="token punctuation">[</span><span class="token punctuation">]</span> args<span class="token punctuation">)</span> <span class="token keyword">throws</span> Exception<span class="token punctuation">{</span>
-        <span class="token comment" spellcheck="true">//1.读取配置文件</span>
-        InputStream inputStream <span class="token operator">=</span> Resources<span class="token punctuation">.</span><span class="token function">getResourceAsStream</span><span class="token punctuation">(</span><span class="token string">"SqlMapConfig.xml"</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//2.创建SQL Session Factory工厂</span>
-        SqlSessionFactoryBuilder builder <span class="token operator">=</span> <span class="token keyword">new</span> <span class="token class-name">SqlSessionFactoryBuilder</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        SqlSessionFactory factory <span class="token operator">=</span> builder<span class="token punctuation">.</span><span class="token function">build</span><span class="token punctuation">(</span>inputStream<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//3.使用工厂生产SqlSession对象</span>
-        SqlSession session <span class="token operator">=</span> factory<span class="token punctuation">.</span><span class="token function">openSession</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//4.使用SQL Session创建Dao接口代理对象</span>
-        IUserDao userDao <span class="token operator">=</span> session<span class="token punctuation">.</span><span class="token function">getMapper</span><span class="token punctuation">(</span>IUserDao<span class="token punctuation">.</span><span class="token keyword">class</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token comment" spellcheck="true">//5.使用代理对象执行方法</span>
-        List<span class="token operator">&lt;</span>User<span class="token operator">></span> users<span class="token punctuation">;</span>
-        users <span class="token operator">=</span> userDao<span class="token punctuation">.</span><span class="token function">findAll</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token keyword">for</span> <span class="token punctuation">(</span>User user <span class="token operator">:</span> users<span class="token punctuation">)</span><span class="token punctuation">{</span>
-            System<span class="token punctuation">.</span>out<span class="token punctuation">.</span><span class="token function">println</span><span class="token punctuation">(</span>user<span class="token punctuation">)</span><span class="token punctuation">;</span>
-        <span class="token punctuation">}</span>
-        <span class="token comment" spellcheck="true">//6.释放资源</span>
-        session<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-        inputStream<span class="token punctuation">.</span><span class="token function">close</span><span class="token punctuation">(</span><span class="token punctuation">)</span><span class="token punctuation">;</span>
-    <span class="token punctuation">}</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
-<p>执行后发现报错并不如愿，理想中的报错应该是返回由于映射的没有返回结果而报错，最终发现是自己的mapper地址写错，以及jdbc的驱动加载写错。</p>
-<ul>
-<li><p>mybatis的映射配置文件位置必须和dao接口的包接口相同</p>
-</li>
-<li><p>映射配置文件mapper的标签namespace属性取值必须是dao接口的全限定类名</p>
-</li>
-<li><p>映射配置文件的操作配置，id属性取值必须是dao接口的方法名。</p>
-</li>
-</ul>
-<h3 id="实例中使用到的几个类"><a href="#实例中使用到的几个类" class="headerlink" title="实例中使用到的几个类"></a>实例中使用到的几个类</h3><ol>
-<li>class Resources</li>
-<li>class SqlSessionFactoryBuilder</li>
-<li>interface SqlSessionFactory</li>
-<li>interface SqlSession</li>
-</ol>
-<p>在符合上面的几个条件的情况下，就不需要再写dao的实现类了。</p>
-<h3 id="注解方式来使用mybatis"><a href="#注解方式来使用mybatis" class="headerlink" title="注解方式来使用mybatis"></a>注解方式来使用mybatis</h3><p>则可以删除每个dao对应的dao.xml改为@select注解，并且指定SQL语句，在config文件中配置mappper时，使用class属性指定dao接口的全限定类名。</p>
-<h2 id="自定义MyBatis"><a href="#自定义MyBatis" class="headerlink" title="自定义MyBatis"></a>自定义MyBatis</h2><ol>
-<li><p>首先需要有数据库的连接信息，通过连接信息，可以创建Connection对象，接下来需要映射的配置信息，最后从映射中配置需要的SQL语句。就可以获取PreparedStatement。通过dom4j来解析这些xml配置。</p>
-</li>
-<li><p>根据配置文件的细腻些创建Connection对象，获取预处理对象PrepareSatement接下来执行查询，将遍历的结果集封装，将结果返回。</p>
-</li>
-</ol>
-
-      </div>
-  </article>
-
 
   <nav class="pagination clearfix">
   <ul>
@@ -887,7 +858,7 @@ num_batches <span class="token operator">=</span> int<span class="token punctuat
 
 </section>
     <footer id="footer" role="contentinfo">
-    <div>&copy; 2023 <a href="/">Kopaba</a>.
+    <div>&copy; 2024 <a href="/">Kopaba</a>.
     Powered by <a href="http://hexo.io/" target="_blank">Hexo</a>. Designed by <a href="http://rainylog.com" target="_blank">Rainy.</a>
 	</div>
 </footer><!-- end #footer -->
