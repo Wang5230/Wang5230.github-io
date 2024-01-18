@@ -57,7 +57,7 @@
     <h1 class="post-title"><a href="/">figure_draw_py</a></h1>
     <ul class="post-meta">
   <li><i class="fa fa-user"></i> Author kopaba</li>
-  <li><i class="fa fa-calendar"></i> Date 8月 29</li>
+  <li><i class="fa fa-calendar"></i> Date 1月 15</li>
   <li><i class="fa fa-folder"></i> Categories
   
     no_categories
@@ -112,19 +112,17 @@ rec <span class="token operator">=</span> shp_file<span class="token punctuation
             mark<span class="token punctuation">[</span>j<span class="token punctuation">,</span>i<span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">True</span> <span class="token comment" spellcheck="true"># 根据shp文件结构不同，需要调整poly的结构，如这里使用的是甘肃省界shp文件，内部仅有一个多边形</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <p>到这里，mark数组就变为了在甘肃省内部为True，外部为False的一个标记数组，之后将经纬度网格点以及降水数据网格点取mark，即可绘制图像。这是python中较为常用的一个特性</p>
 <ol start="3">
-<li><p>绘图</p>
+<li>绘图</li>
+</ol>
 <ul>
-<li>主要用到matplotlib下的pyplot包,<em>需要在画图时将图中出现的字体改为新罗马</em><pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> matplotlib <span class="token keyword">import</span> pyplot <span class="token keyword">as</span> plt <span class="token comment" spellcheck="true">#引入pyplot库</span>
+<li><p>主要用到matplotlib下的pyplot包,<em>需要在画图时将图中出现的字体改为新罗马</em></p>
+<pre class="line-numbers language-python"><code class="language-python"><span class="token keyword">from</span> matplotlib <span class="token keyword">import</span> pyplot <span class="token keyword">as</span> plt <span class="token comment" spellcheck="true">#引入pyplot库</span>
 <span class="token keyword">import</span> matplotlib <span class="token keyword">as</span> mpl
 mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'font.family'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'sans-serif'</span>
 mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'font.sans-serif'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token punctuation">[</span><span class="token string">'Times New Roman'</span><span class="token punctuation">]</span>
 mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'axes.unicode_minus'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token boolean">False</span>
 mpl<span class="token punctuation">.</span>rcParams<span class="token punctuation">[</span><span class="token string">'mathtext.fontset'</span><span class="token punctuation">]</span> <span class="token operator">=</span> <span class="token string">'stix'</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 </li>
-</ul>
-</li>
-</ol>
-<ul>
 <li><p>主要的画图函数有</p>
 <pre class="line-numbers language-python"><code class="language-python">plt<span class="token punctuation">.</span>plot<span class="token punctuation">(</span>x <span class="token operator">=</span> <span class="token punctuation">,</span>y <span class="token operator">=</span> <span class="token punctuation">,</span>color <span class="token operator">=</span> <span class="token punctuation">,</span>linestyle <span class="token operator">=</span> <span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#折线图 可指定线条颜色，线条形式(实线 solid、虚线 dashed...)</span>
 plt<span class="token punctuation">.</span>contourf<span class="token punctuation">(</span>x <span class="token operator">=</span> <span class="token punctuation">,</span> y <span class="token operator">=</span> <span class="token punctuation">,</span> z <span class="token operator">=</span> <span class="token punctuation">,</span> cmap <span class="token operator">=</span> <span class="token punctuation">)</span> <span class="token comment" spellcheck="true">#填色图 z为每个格点上对应的值，注意，这里的xy必须为网格点数据，即不能是单一的xy一维序列，而是网格坐标，cmap可以修改填色所使用的colorbar</span>
@@ -146,7 +144,7 @@ ax <span class="token operator">=</span> fig<span class="token punctuation">.</s
 ax1 <span class="token operator">=</span> fig<span class="token punctuation">.</span>addsubplot<span class="token punctuation">(</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">2</span><span class="token punctuation">,</span><span class="token number">1</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 此时添加了一副2*2的子图，并指定当前绘图区域在第一幅，即左上图，按照左到右，上到下排序</span>
 <span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span><span class="token punctuation">.</span>
 <span class="token comment" spellcheck="true"># 在绘图结束后，可以调用</span>
-plt<span class="token punctuation">.</span>savefig<span class="token punctuation">(</span>fanme <span class="token operator">=</span> <span class="token punctuation">,</span> dpi <span class="token operator">=</span> <span class="token punctuation">,</span> Orientation <span class="token operator">=</span> <span class="token punctuation">,</span> format <span class="token operator">=</span> <span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 参数包括</span>
+plt<span class="token punctuation">.</span>savefig<span class="token punctuation">(</span>fanme <span class="token operator">=</span> <span class="token punctuation">,</span> dpi <span class="token operator">=</span> <span class="token punctuation">,</span> Orientation <span class="token operator">=</span> <span class="token punctuation">,</span> format <span class="token operator">=</span> <span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 参数包括文件保存地址与文件名，文件清晰度(如保存位图可忽略)，图片方向，图片格式</span>
 <span class="token comment" spellcheck="true"># 或是</span>
 plt<span class="token punctuation">.</span>show<span class="token punctuation">(</span><span class="token punctuation">)</span> <span class="token comment" spellcheck="true"># 在弹出的对话框中选择保存的形式</span><span aria-hidden="true" class="line-numbers-rows"><span></span><span></span><span></span><span></span><span></span><span></span><span></span><span></span></span></code></pre>
 <ul>
